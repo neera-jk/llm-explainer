@@ -1,137 +1,40 @@
-/* ─── Prompt chips ───────────────────────────── */
-.prompt-section {
-    margin-bottom: 1.25rem;
+/* ─── Pipeline wrapper ───────────────────────── */
+.pipeline-wrap {
+    padding: 2rem 5% 1rem;
+    background: var(--bg-base);
+    border-bottom: 0.5px solid var(--border-subtle);
 }
 
-.prompt-chips {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.chip {
-    font-size: 13px;
-    padding: 7px 16px;
-    border-radius: 8px;
-    border: 0.5px solid #d3d1c7;
-    cursor: pointer;
-    color: #73726c;
-    background: #fff;
-    transition: all 0.15s;
-    white-space: nowrap;
-}
-
-.chip:hover {
-    border-color: #AFA9EC;
-    color: #3d3d3a;
-}
-
-.chip-active {
-    background: #EEEDFE;
-    border-color: #AFA9EC;
-    color: #3C3489;
-    font-weight: 500;
-}
-
-/* ─── Token strip ────────────────────────────── */
-.tok-section {
-    margin-bottom: 2rem;
-}
-
-.tok-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-}
-
-.tok-lbl {
-    font-size: 11px;
-    color: #888780;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 500;
-    flex-shrink: 0;
-}
-
-.tok-hint {
-    font-size: 11px;
-    color: #888780;
-    background: #f5f4f0;
-    border-radius: 6px;
-    padding: 2px 10px;
-}
-
-.tok-row {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-.tok-chip {
-    background: #fff;
-    border: 0.5px solid #AFA9EC;
-    border-radius: 8px;
-    padding: 7px 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-}
-
-.tok-text {
-    font-size: 13px;
-    font-weight: 500;
-    color: #3C3489;
-}
-
-.tok-id-wrap {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-}
-
-.tok-id {
-    font-size: 10px;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    color: #7F77DD;
-}
-
-.tok-id-label {
-    font-size: 9px;
-    color: #AFA9EC;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
-
-/* ─── Pipeline row ───────────────────────────── */
 .pipeline {
     display: flex;
-    align-items: flex-end;
-    overflow-x: auto;
-    padding: 0.5rem 0 1rem;
-    -webkit-overflow-scrolling: touch;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
 }
 
 .pipeline-item {
     display: flex;
     align-items: center;
-    flex-shrink: 0;
+    flex: 1;
+    min-width: 0;
 }
 
 .block-col {
     display: flex;
     flex-direction: column;
     align-items: center;
+    flex: 1;
+    min-width: 0;
 }
 
 /* ─── Block cards ────────────────────────────── */
 .block {
-    width: 140px;
-    border-radius: 16px;
-    border: 0.5px solid #d3d1c7;
-    background: #fff;
+    width: 100%;
+    max-width: 160px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-left: 3px solid transparent;
+    background: var(--bg-surface);
     cursor: pointer;
     transition: all 0.2s;
     overflow: hidden;
@@ -141,25 +44,44 @@
 }
 
 .block:hover {
-    border-color: #AFA9EC;
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(127, 119, 221, 0.1);
+    border-color: rgba(255, 255, 255, 0.12);
+    border-left-color: inherit;
+    transform: translateY(-5px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    background: #26262e;
 }
 
 .block-active {
-    border: 1.5px solid #7F77DD !important;
-    box-shadow: 0 8px 24px rgba(127, 119, 221, 0.15) !important;
+    transform: translateY(-5px) !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
 }
 
 .block-accent {
-    width: 148px;
-    border-color: #AFA9EC;
+    max-width: 176px;
+}
+
+.block-bar {
+    height: 4px;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.block--transformer .block-bar {
+    height: 6px;
+}
+
+.block-step {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    padding: 8px 12px 0;
+    display: block;
 }
 
 /* ─── Block preview area ─────────────────────── */
 .block-preview {
     width: 100%;
-    height: 60px;
+    height: 64px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -167,69 +89,64 @@
 }
 
 .block-preview--tokenizer {
-    background: #F1EFE8;
+    background: var(--accent-tok-light);
 }
 
 .block-preview--embedding {
-    background: #EEEDFE;
+    background: var(--accent-emb-light);
 }
 
 .block-preview--transformer {
-    background: #EEEDFE;
+    background: var(--accent-xfmr-light);
+    height: 80px;
 }
 
 .block-preview--unembed {
-    background: #FAECE7;
+    background: var(--accent-unemb-light);
 }
 
 .block-preview--softmax {
-    background: #E1F5EE;
+    background: var(--accent-sfmx-light);
 }
 
 .preview-svg {
     width: 108px;
-    height: 48px;
+    height: 52px;
     display: block;
 }
 
 .preview-svg--wide {
-    width: 116px;
+    width: 120px;
 }
 
-/* ─── Block info and footer ──────────────────── */
+/* ─── Block info + footer ────────────────────── */
 .block-info {
     padding: 10px 12px 8px;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 3px;
 }
 
 .block-name {
     font-size: 13px;
     font-weight: 500;
-    color: #3d3d3a;
+    color: var(--text-primary);
 }
 
 .block-sub {
     font-size: 10px;
-    color: #888780;
+    color: var(--text-muted);
 }
 
 .block-footer {
     padding: 6px 12px;
-    border-top: 0.5px solid #f0efe8;
-    background: #fafaf8;
-}
-
-.block-footer--accent {
-    background: #EEEDFE;
-    border-top-color: #AFA9EC;
+    border-top: 0.5px solid var(--border-subtle);
+    background: rgba(0, 0, 0, 0.2);
 }
 
 .block-shape {
     font-size: 10px;
     font-family: 'SF Mono', 'Fira Code', monospace;
-    color: #534AB7;
     display: block;
     text-align: center;
 }
@@ -237,6 +154,71 @@
 /* ─── Flow connector canvas ──────────────────── */
 .flow-canvas {
     display: block;
-    flex-shrink: 0;
+    flex: 1;
+    min-width: 32px;
+    max-width: 88px;
+    height: 90px;
     margin-bottom: 38px;
+}
+
+.pipeline-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 8px 0 4px;
+}
+
+/* ─── Inline block detail panel ──────────────── */
+.block-detail-panel {
+    padding: 2.5rem 10% 3rem;
+    background: var(--bg-base);
+    border-top: 0.5px solid var(--border-subtle);
+}
+
+.block-detail-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--bg-surface);
+    border-radius: 20px;
+    border: 0.5px solid var(--border-soft);
+    overflow: hidden;
+}
+
+.block-detail-accent-bar {
+    height: 3px;
+    width: 100%;
+}
+
+.block-detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.75rem;
+    border-bottom: 0.5px solid var(--border-subtle);
+}
+
+.block-detail-title {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.block-detail-close {
+    font-size: 12px;
+    color: var(--text-muted);
+    background: transparent;
+    border: 0.5px solid var(--border-soft);
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: all 0.15s;
+}
+
+.block-detail-close:hover {
+    color: var(--text-primary);
+    border-color: var(--border-medium);
+}
+
+.block-detail-body {
+    padding: 1.75rem;
 }

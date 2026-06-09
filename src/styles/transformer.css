@@ -1,11 +1,9 @@
-/* ─── Layer stack ────────────────────────────── */
 .layer-stack-outer {
     position: relative;
     padding-top: 10px;
     width: 100%;
 }
 
-/* shadow layers behind the top card — decorative depth effect */
 .layer-shadow-1 {
     position: absolute;
     top: 16px;
@@ -13,8 +11,8 @@
     right: -4px;
     height: 46px;
     border-radius: 10px;
-    border: 0.5px solid #d3d1c7;
-    background: #eeede4;
+    border: 0.5px solid var(--border-subtle);
+    background: var(--bg-elevated);
     z-index: 1;
     pointer-events: none;
 }
@@ -26,20 +24,19 @@
     right: -8px;
     height: 46px;
     border-radius: 10px;
-    border: 0.5px solid #d3d1c7;
-    background: #e8e7de;
+    border: 0.5px solid var(--border-subtle);
+    background: var(--bg-overlay);
     z-index: 0;
     pointer-events: none;
 }
 
-/* ─── Layer card ─────────────────────────────── */
 .layer-card-new {
     position: relative;
     z-index: 2;
-    border: 0.5px solid #d3d1c7;
+    border: 0.5px solid var(--border-subtle);
     border-radius: 10px;
     padding: 11px 14px;
-    background: #fff;
+    background: var(--bg-surface);
     cursor: pointer;
     transition: all 0.18s;
     margin-bottom: 3px;
@@ -47,14 +44,14 @@
 }
 
 .layer-card-new:hover {
-    border-color: #AFA9EC;
-    background: #FDFCFF;
+    border-color: var(--border-medium);
+    background: var(--bg-elevated);
     transform: translateX(3px);
 }
 
 .layer-card-active {
     border: 1.5px solid #7F77DD !important;
-    background: #FDFCFF !important;
+    background: var(--bg-elevated) !important;
     transform: translateX(3px) !important;
 }
 
@@ -69,9 +66,9 @@
 .layer-num-badge {
     font-size: 11px;
     font-family: 'SF Mono', 'Fira Code', monospace;
-    color: #534AB7;
-    background: #EEEDFE;
-    border: 0.5px solid #AFA9EC;
+    color: #AFA9EC;
+    background: rgba(127, 119, 221, 0.15);
+    border: 0.5px solid rgba(127, 119, 221, 0.3);
     border-radius: 4px;
     padding: 2px 7px;
     flex-shrink: 0;
@@ -80,7 +77,7 @@
 .layer-card-label {
     font-size: 12px;
     font-weight: 500;
-    color: #3d3d3a;
+    color: var(--text-primary);
     flex: 1;
     min-width: 0;
 }
@@ -90,9 +87,9 @@
     padding: 2px 7px;
     border-radius: 4px;
     font-family: 'SF Mono', 'Fira Code', monospace;
-    background: #EEEDFE;
-    color: #3C3489;
-    border: 0.5px solid #AFA9EC;
+    background: rgba(127, 119, 221, 0.12);
+    color: #AFA9EC;
+    border: 0.5px solid rgba(127, 119, 221, 0.3);
     flex-shrink: 0;
 }
 
@@ -101,49 +98,47 @@
     padding: 2px 7px;
     border-radius: 4px;
     font-family: 'SF Mono', 'Fira Code', monospace;
-    background: #FAEEDA;
-    color: #633806;
-    border: 0.5px solid #EF9F27;
+    background: rgba(186, 117, 23, 0.12);
+    color: #EF9F27;
+    border: 0.5px solid rgba(186, 117, 23, 0.3);
     flex-shrink: 0;
 }
 
 .layer-card-shape {
     font-size: 10px;
     font-family: 'SF Mono', 'Fira Code', monospace;
-    color: #888780;
+    color: var(--text-muted);
     flex-shrink: 0;
 }
 
 .layer-card-chevron {
     font-size: 10px;
-    color: #888780;
+    color: var(--text-muted);
     flex-shrink: 0;
 }
 
 .more-layers-label {
     text-align: center;
     font-size: 11px;
-    color: #888780;
+    color: var(--text-muted);
     padding: 8px 0 4px;
     letter-spacing: 0.04em;
 }
 
-/* ─── Layer detail box ───────────────────────── */
 .layer-detail-box {
-    border: 1.5px solid #7F77DD;
+    border: 1.5px solid rgba(127, 119, 221, 0.4);
     border-radius: 0 0 12px 12px;
     overflow: hidden;
     margin-top: -3px;
     margin-bottom: 6px;
-    background: #fff;
+    background: var(--bg-surface);
     width: 100%;
 }
 
-/* ─── Detail tabs ────────────────────────────── */
 .layer-detail-tabs {
     display: flex;
-    border-bottom: 0.5px solid #d3d1c7;
-    background: #fafaf8;
+    border-bottom: 0.5px solid var(--border-subtle);
+    background: var(--bg-elevated);
 }
 
 .dtab {
@@ -152,24 +147,23 @@
     border: none;
     background: none;
     cursor: pointer;
-    color: #888780;
+    color: var(--text-muted);
     border-bottom: 2px solid transparent;
     transition: all 0.15s;
     white-space: nowrap;
 }
 
 .dtab:hover {
-    color: #3d3d3a;
+    color: var(--text-secondary);
 }
 
 .dtab-on {
-    color: #534AB7;
+    color: #AFA9EC;
     border-bottom-color: #7F77DD;
-    background: #fff;
+    background: var(--bg-surface);
     font-weight: 500;
 }
 
-/* ─── Animation block ────────────────────────── */
 .anim-block {
     padding: 14px;
     width: 100%;
@@ -187,28 +181,33 @@
     font-size: 12px;
     padding: 5px 14px;
     border-radius: 8px;
-    border: 0.5px solid #AFA9EC;
-    background: #EEEDFE;
-    color: #534AB7;
+    border: 0.5px solid rgba(127, 119, 221, 0.3);
+    background: rgba(127, 119, 221, 0.1);
+    color: #AFA9EC;
     cursor: pointer;
     transition: all 0.15s;
     white-space: nowrap;
 }
 
 .anim-btn:hover {
-    background: #E0DEFF;
+    background: rgba(127, 119, 221, 0.18);
+}
+
+.anim-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .anim-info {
     font-size: 12px;
-    color: #73726c;
+    color: var(--text-muted);
     min-height: 18px;
     margin-bottom: 10px;
     line-height: 1.5;
 }
 
 .anim-info strong {
-    color: #3d3d3a;
+    color: var(--text-primary);
     font-weight: 500;
 }
 
@@ -230,19 +229,18 @@
     height: 220px;
 }
 
-/* ─── KV cache note ──────────────────────────── */
 .kv-note {
     font-size: 12px;
-    color: #73726c;
-    background: #f5f4f0;
+    color: var(--text-muted);
+    background: var(--bg-elevated);
     padding: 8px 12px;
     margin-top: 10px;
     line-height: 1.6;
-    border-left: 2px solid #AFA9EC;
+    border-left: 2px solid rgba(127, 119, 221, 0.4);
     border-radius: 0;
 }
 
 .kv-note strong {
-    color: #3d3d3a;
+    color: var(--text-primary);
     font-weight: 500;
 }

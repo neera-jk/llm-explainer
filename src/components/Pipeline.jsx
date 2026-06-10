@@ -13,20 +13,20 @@ function getShape(blockId, tokens, model) {
 const COLORS = {
     tokenizer: { dot: '#888780', pulse: 'flow-pulse--gray' },
     embedding: { dot: '#7F77DD', pulse: 'flow-pulse--purple' },
-    unembed: { dot: '#D85A30', pulse: 'flow-pulse--coral' },
-    softmax: { dot: '#1D9E75', pulse: 'flow-pulse--green' },
+    unembed: { dot: '#b85428', pulse: 'flow-pulse--coral' },
+    softmax: { dot: '#1a8a65', pulse: 'flow-pulse--green' },
 }
 
 function TokenizerPreview({ tokens }) {
     return (
-        <svg viewBox="0 0 100 42" width="100" height="42">
+        <svg viewBox="0 0 110 48" width="110" height="48">
             {tokens.slice(0, 4).map((t, i) => (
-                <g key={i} transform={`translate(${i * 24 + 2}, 0)`}>
-                    <rect x="0" y="2" width="20" height="14" rx="3" fill="#2a2a32" />
-                    <text x="10" y="12" fontSize="6.5" fill="#73726c" textAnchor="middle" fontFamily="monospace">{t.token}</text>
-                    <line x1="10" y1="17" x2="10" y2="24" stroke="#444441" strokeWidth="0.8" strokeDasharray="2,1" />
-                    <rect x="0" y="25" width="20" height="13" rx="2" fill="#2a2a32" />
-                    <text x="10" y="34" fontSize="6" fill="#888780" textAnchor="middle" fontFamily="monospace">{t.id}</text>
+                <g key={i} transform={`translate(${i * 26 + 2}, 0)`}>
+                    <rect x="0" y="2" width="22" height="16" rx="3" fill="#2a2a32" />
+                    <text x="11" y="13" fontSize="7" fill="#73726c" textAnchor="middle" fontFamily="monospace">{t.token}</text>
+                    <line x1="11" y1="19" x2="11" y2="27" stroke="#444441" strokeWidth="0.8" strokeDasharray="2,1" />
+                    <rect x="0" y="28" width="22" height="15" rx="2" fill="#2a2a32" />
+                    <text x="11" y="38" fontSize="6.5" fill="#888780" textAnchor="middle" fontFamily="monospace">{t.id}</text>
                 </g>
             ))}
         </svg>
@@ -34,14 +34,14 @@ function TokenizerPreview({ tokens }) {
 }
 
 function EmbeddingPreview({ tokens }) {
-    const heights = [28, 38, 20, 34]
+    const heights = [30, 42, 22, 36]
     return (
-        <svg viewBox="0 0 100 42" width="100" height="42">
+        <svg viewBox="0 0 110 48" width="110" height="48">
             {tokens.slice(0, 4).map((_, i) => (
-                <g key={i} transform={`translate(${i * 24 + 4}, 0)`}>
-                    <rect x="0" y={40 - heights[i]} width="18" height={heights[i]} rx="2"
+                <g key={i} transform={`translate(${i * 26 + 4}, 0)`}>
+                    <rect x="0" y={46 - heights[i]} width="20" height={heights[i]} rx="2"
                         fill="rgba(127,119,221,0.15)" stroke="rgba(127,119,221,0.35)" strokeWidth="0.5" />
-                    <rect x="0" y={40 - heights[i]} width="18" height="7" rx="2" fill="#7F77DD" />
+                    <rect x="0" y={46 - heights[i]} width="20" height="8" rx="2" fill="#7F77DD" />
                 </g>
             ))}
         </svg>
@@ -50,30 +50,30 @@ function EmbeddingPreview({ tokens }) {
 
 function UnembedPreview() {
     return (
-        <svg viewBox="0 0 100 42" width="100" height="42">
-            <rect x="2" y="10" width="24" height="22" rx="3" fill="rgba(216,90,48,0.12)" stroke="rgba(216,90,48,0.35)" strokeWidth="0.5" />
-            <text x="14" y="24" fontSize="7" fill="#D85A30" textAnchor="middle" fontFamily="monospace">768</text>
-            <line x1="28" y1="21" x2="42" y2="21" stroke="#D85A30" strokeWidth="1" />
-            <polygon points="40,18 46,21 40,24" fill="#D85A30" />
-            <rect x="48" y="4" width="46" height="34" rx="3" fill="rgba(216,90,48,0.08)" stroke="#D85A30" strokeWidth="0.6" />
-            <text x="71" y="19" fontSize="6.5" fill="#D85A30" textAnchor="middle" fontFamily="monospace">50,257</text>
-            <text x="71" y="28" fontSize="5.5" fill="rgba(216,90,48,0.5)" textAnchor="middle" fontFamily="monospace">logits</text>
+        <svg viewBox="0 0 110 48" width="110" height="48">
+            <rect x="2" y="12" width="26" height="24" rx="3" fill="rgba(184,84,40,0.12)" stroke="rgba(184,84,40,0.35)" strokeWidth="0.5" />
+            <text x="15" y="26" fontSize="7.5" fill="#b85428" textAnchor="middle" fontFamily="monospace">768</text>
+            <line x1="30" y1="24" x2="44" y2="24" stroke="#b85428" strokeWidth="1" />
+            <polygon points="42,21 48,24 42,27" fill="#b85428" />
+            <rect x="50" y="5" width="52" height="38" rx="3" fill="rgba(184,84,40,0.08)" stroke="#b85428" strokeWidth="0.6" />
+            <text x="76" y="22" fontSize="7" fill="#b85428" textAnchor="middle" fontFamily="monospace">50,257</text>
+            <text x="76" y="32" fontSize="6" fill="rgba(184,84,40,0.5)" textAnchor="middle" fontFamily="monospace">logits</text>
         </svg>
     )
 }
 
 function SoftmaxPreview() {
     const bars = [
-        { w: 80, o: 1 }, { w: 58, o: 0.7 }, { w: 36, o: 0.45 },
-        { w: 22, o: 0.28 }, { w: 10, o: 0.15 },
+        { w: 84, o: 1 }, { w: 62, o: 0.7 }, { w: 40, o: 0.45 },
+        { w: 26, o: 0.28 }, { w: 12, o: 0.15 },
     ]
     return (
-        <svg viewBox="0 0 100 42" width="100" height="42">
+        <svg viewBox="0 0 110 48" width="110" height="48">
             {bars.map((b, i) => (
-                <rect key={i} x="0" y={i * 8 + 1} width={b.w} height="6" rx="2"
-                    fill="#1D9E75" opacity={b.o} />
+                <rect key={i} x="0" y={i * 9 + 1} width={b.w} height="7" rx="2"
+                    fill="#1a8a65" opacity={b.o} />
             ))}
-            <text x="84" y="8" fontSize="5.5" fill="#1D9E75" fontFamily="monospace">38%</text>
+            <text x="90" y="9" fontSize="6" fill="#1a8a65" fontFamily="monospace">38%</text>
         </svg>
     )
 }
@@ -146,7 +146,6 @@ export default function Pipeline({ model, tokens, onBlockClick, onLayerClick, ac
     const T = tokens.length
     const layerShape = `[${T}×${model.d_model}]`
 
-    // Collapse: show first 3, ellipsis, last layer
     const showFirst = Math.min(3, model.n_layers)
     const lastLayer = model.n_layers - 1
     const needsEllipsis = model.n_layers > 5

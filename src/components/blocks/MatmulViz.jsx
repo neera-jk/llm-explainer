@@ -158,7 +158,11 @@ export default function MatmulViz() {
             <div className="anim-info">{info}</div>
             <canvas ref={canvasRef} style={{ width: '100%', height: 210, display: 'block' }} />
             <div className="kv-note">
-                <strong>Matrix multiplication</strong> is the core operation in every transformer layer. Every linear projection (Q, K, V, FFN up/down) is a matmul.
+                <strong>Matrix multiplication</strong> is the most fundamental operation in a transformer.
+                Every time the model projects into Q, K, V, computes attention scores, or runs
+                the feed-forward network, it is doing a matrix multiplication. Each output cell
+                is computed by multiplying one row of the first matrix with one column of the second
+                and summing the results (a dot product).
             </div>
         </div>
     )

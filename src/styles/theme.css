@@ -18,10 +18,10 @@
     --accent-emb-light: rgba(127, 119, 221, 0.06);
     --accent-xfmr: #BA7517;
     --accent-xfmr-light: rgba(186, 117, 23, 0.06);
-    --accent-unemb: #D85A30;
-    --accent-unemb-light: rgba(216, 90, 48, 0.06);
-    --accent-sfmx: #1D9E75;
-    --accent-sfmx-light: rgba(29, 158, 117, 0.06);
+    --accent-unemb: #b85428;
+    --accent-unemb-light: rgba(184, 84, 40, 0.06);
+    --accent-sfmx: #1a8a65;
+    --accent-sfmx-light: rgba(26, 138, 101, 0.06);
 
     --radius-sm: 6px;
     --radius-md: 10px;

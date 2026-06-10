@@ -23,16 +23,17 @@ body {
 .app {
     width: 100%;
     min-height: 100vh;
+    zoom: 1.16;
 }
 
 /* ---- Navbar ---- */
 .navbar {
     background: var(--bg-surface);
     border-bottom: 1px solid var(--border-subtle);
-    padding: 0 clamp(1rem, 4vw, 2rem);
+    padding: 0 clamp(1.25rem, 5vw, 3rem);
     display: flex;
     align-items: center;
-    height: 52px;
+    height: 58px;
     position: sticky;
     top: 0;
     z-index: 50;
@@ -40,29 +41,29 @@ body {
 }
 
 .nav-logo {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
     color: var(--text-primary);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 9px;
     letter-spacing: -0.01em;
 }
 
 .nav-logo-dot {
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: var(--accent-emb);
     flex-shrink: 0;
 }
 
 .nav-tag {
-    font-size: 10px;
+    font-size: 11px;
     color: #AFA9EC;
     background: rgba(127, 119, 221, 0.12);
     border: 1px solid rgba(127, 119, 221, 0.2);
-    padding: 2px 7px;
+    padding: 3px 9px;
     border-radius: 20px;
     margin-left: 4px;
     font-weight: 500;
@@ -70,13 +71,13 @@ body {
 
 .nav-models {
     display: flex;
-    gap: 3px;
+    gap: 4px;
     margin-left: auto;
 }
 
 .npill {
-    font-size: 11px;
-    padding: 5px 12px;
+    font-size: 13px;
+    padding: 6px 16px;
     border-radius: 20px;
     border: 1px solid var(--border-subtle);
     cursor: pointer;
@@ -103,7 +104,7 @@ body {
 .intro-strip {
     background: var(--bg-surface);
     border-bottom: 1px solid var(--border-subtle);
-    padding: 1.25rem clamp(1rem, 5vw, 3rem);
+    padding: 1.5rem clamp(1.25rem, 5vw, 3rem);
 }
 
 .intro-content {
@@ -115,21 +116,21 @@ body {
 }
 
 .intro-title {
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: 3px;
+    margin-bottom: 4px;
     letter-spacing: -0.02em;
 }
 
 .intro-desc {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--text-muted);
 }
 
 .intro-stats {
     display: flex;
-    gap: 1.75rem;
+    gap: 2rem;
     flex-shrink: 0;
 }
 
@@ -137,11 +138,11 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
+    gap: 3px;
 }
 
 .istat-val {
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 600;
     color: var(--text-primary);
     font-family: var(--font-mono);
@@ -149,7 +150,7 @@ body {
 }
 
 .istat-label {
-    font-size: 9px;
+    font-size: 10px;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -160,33 +161,33 @@ body {
 .prompt-bar {
     background: var(--bg-base);
     border-bottom: 1px solid var(--border-subtle);
-    padding: 1rem clamp(1rem, 5vw, 3rem);
+    padding: 1.25rem clamp(1.25rem, 5vw, 3rem);
 }
 
 .prompt-bar-inner {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
 }
 
 .prompt-label {
-    font-size: 9px;
+    font-size: 10px;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-weight: 600;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
 }
 
 .prompt-chips {
     display: flex;
-    gap: 6px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
 .chip {
-    font-size: 12px;
-    padding: 6px 14px;
+    font-size: 14px;
+    padding: 8px 18px;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border-subtle);
     cursor: pointer;
@@ -217,7 +218,7 @@ body {
 .tok-row {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
@@ -225,15 +226,15 @@ body {
     background: var(--bg-surface);
     border: 1px solid rgba(127, 119, 221, 0.15);
     border-radius: var(--radius-sm);
-    padding: 5px 10px;
+    padding: 7px 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
+    gap: 3px;
 }
 
 .tok-text {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 500;
     color: #AFA9EC;
 }
@@ -241,23 +242,23 @@ body {
 .tok-id-wrap {
     display: flex;
     align-items: center;
-    gap: 3px;
+    gap: 4px;
 }
 
 .tok-id {
-    font-size: 10px;
+    font-size: 12px;
     font-family: var(--font-mono);
     color: #534AB7;
 }
 
 .tok-id-label {
-    font-size: 8px;
+    font-size: 9px;
     color: var(--text-muted);
     text-transform: uppercase;
 }
 
 .tok-hint {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-muted);
 }
 
@@ -331,7 +332,6 @@ body {
     border-top: 1px solid var(--border-soft);
 }
 
-/* Right-edge safety: when parent is near right side */
 .tip-wrap--right .tip-box {
     left: auto;
     right: 0;
@@ -349,7 +349,6 @@ body {
     transform: rotate(45deg);
 }
 
-/* Left-edge safety */
 .tip-wrap--left .tip-box {
     left: 0;
     transform: translateX(0) translateY(4px);
@@ -367,21 +366,42 @@ body {
 
 /* ---- Responsive ---- */
 @media (max-width: 768px) {
+    .navbar {
+        height: 50px;
+    }
+
+    .nav-logo {
+        font-size: 14px;
+    }
+
+    .npill {
+        font-size: 11px;
+        padding: 4px 10px;
+    }
+
+    .intro-title {
+        font-size: 18px;
+    }
+
     .intro-stats {
         gap: 1rem;
     }
 
     .istat-val {
-        font-size: 16px;
+        font-size: 18px;
     }
 
-    .intro-title {
-        font-size: 17px;
+    .chip {
+        font-size: 12px;
+        padding: 6px 14px;
     }
 
-    .npill {
+    .tok-text {
+        font-size: 13px;
+    }
+
+    .tok-id {
         font-size: 10px;
-        padding: 4px 8px;
     }
 }
 

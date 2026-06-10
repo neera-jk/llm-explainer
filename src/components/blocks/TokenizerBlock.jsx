@@ -6,17 +6,17 @@ export default function TokenizerBlock({ model, tokens, accent }) {
     return (
         <div className="block-content">
             <p className="block-explain">
-                The tokenizer breaks raw text into <strong>tokens</strong>, chunks roughly the
-                size of a word or syllable. Each token maps to a unique integer ID from a fixed
-                vocabulary of <strong>{model.vocab_size.toLocaleString()} tokens</strong>.
-                The model never sees raw text, only these integer IDs.
+                The tokenizer is the very first step. It breaks your raw text into <strong>tokens</strong>,
+                which are chunks roughly the size of a word or a syllable. Each token is then mapped to a
+                unique integer ID from a fixed vocabulary of <strong>{model.vocab_size.toLocaleString()} tokens</strong>.
+                The model never sees your actual text. It only works with these integer IDs from this point forward.
             </p>
 
             <div className="stats-row">
                 {[
                     { val: model.vocab_size.toLocaleString(), label: 'vocab size' },
                     { val: tokens.length, label: 'tokens in prompt' },
-                    { val: 'BPE', label: 'tokenization method' },
+                    { val: 'BPE', label: 'BPE' },
                 ].map(s => (
                     <div key={s.label} className="stat-card" style={{ background: a.light, borderColor: a.border }}>
                         <span className="stat-val" style={{ color: a.text }}>{s.val}</span>
@@ -50,9 +50,9 @@ export default function TokenizerBlock({ model, tokens, accent }) {
             </div>
 
             <p className="footnote">
-                GPT-2 uses Byte Pair Encoding (BPE), starting with individual characters and
-                merging the most frequent pairs. Common words like "the" get one token.
-                Rare words split into subwords.
+                GPT-2 uses Byte Pair Encoding (BPE) to build its vocabulary. It starts with individual characters
+                and keeps merging the most frequent adjacent pairs into new tokens. This means common words
+                like "the" become a single token, while rare or long words get split into smaller pieces.
             </p>
         </div>
     )

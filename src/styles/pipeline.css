@@ -1,5 +1,5 @@
 .pipeline-section {
-    padding: 2rem clamp(1rem, 5vw, 3rem) 1rem;
+    padding: 2rem clamp(1.25rem, 5vw, 3rem) 1rem;
     background: var(--bg-base);
     border-bottom: 1px solid var(--border-subtle);
 }
@@ -67,11 +67,11 @@
 }
 
 .flow-pulse--coral {
-    stroke: #D85A30;
+    stroke: #b85428;
 }
 
 .flow-pulse--green {
-    stroke: #1D9E75;
+    stroke: #1a8a65;
 }
 
 .flow-head {
@@ -90,8 +90,8 @@
 
 /* ---- Main pipeline block ---- */
 .pblock {
-    width: 140px;
-    min-width: 140px;
+    width: 172px;
+    min-width: 172px;
     border-radius: var(--radius-md);
     border: 1px solid var(--border-subtle);
     background: var(--bg-surface);
@@ -139,11 +139,11 @@
 }
 
 .pblock--unemb::before {
-    background: linear-gradient(135deg, rgba(216, 90, 48, 0.08) 0%, transparent 60%);
+    background: linear-gradient(135deg, rgba(184, 84, 40, 0.08) 0%, transparent 60%);
 }
 
 .pblock--sfmx::before {
-    background: linear-gradient(135deg, rgba(29, 158, 117, 0.08) 0%, transparent 60%);
+    background: linear-gradient(135deg, rgba(26, 138, 101, 0.08) 0%, transparent 60%);
 }
 
 .pblock-active {
@@ -162,10 +162,10 @@
 
 .pblock-dot {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 6px;
-    height: 6px;
+    top: 10px;
+    right: 10px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     opacity: 0;
     transform: scale(0.5);
@@ -175,11 +175,11 @@
 
 .pblock-preview {
     width: 100%;
-    height: 54px;
+    height: 68px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4px 6px;
+    padding: 6px 8px;
     position: relative;
     z-index: 1;
 }
@@ -189,27 +189,27 @@
 }
 
 .pblock-info {
-    padding: 8px 10px 6px;
+    padding: 10px 14px 8px;
     position: relative;
     z-index: 1;
 }
 
 .pblock-name {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--text-primary);
     display: block;
 }
 
 .pblock-sub {
-    font-size: 9px;
+    font-size: 11px;
     color: var(--text-muted);
     display: block;
-    margin-top: 1px;
+    margin-top: 2px;
 }
 
 .pblock-footer {
-    padding: 5px 10px;
+    padding: 7px 14px;
     border-top: 1px solid var(--border-subtle);
     background: rgba(0, 0, 0, 0.12);
     position: relative;
@@ -217,18 +217,18 @@
 }
 
 .pblock-shape {
-    font-size: 9px;
+    font-size: 11px;
     font-family: var(--font-mono);
     color: var(--text-secondary);
     display: block;
     text-align: center;
 }
 
-/* ---- Layer block (compact) ---- */
+/* ---- Layer block ---- */
 .layer-block {
-    width: 46px;
-    min-width: 46px;
-    height: 58px;
+    width: 60px;
+    min-width: 60px;
+    height: 74px;
     border-radius: 8px;
     border: 1px solid var(--border-subtle);
     background: var(--bg-surface);
@@ -238,7 +238,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
+    gap: 3px;
     flex-shrink: 0;
     position: relative;
 }
@@ -273,7 +273,7 @@
 }
 
 .layer-block-num {
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 600;
     font-family: var(--font-mono);
     color: var(--text-primary);
@@ -281,7 +281,7 @@
 }
 
 .layer-block-label {
-    font-size: 7px;
+    font-size: 8px;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -289,8 +289,8 @@
 
 /* layer micro-flow dot */
 .layer-flow {
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -322,13 +322,13 @@
     }
 
     100% {
-        left: 9px;
+        left: 11px;
         opacity: 0;
     }
 }
 
 .layer-ellipsis {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-muted);
     padding: 0 2px;
     flex-shrink: 0;
@@ -336,7 +336,6 @@
     font-weight: 600;
 }
 
-/* layer group */
 .layer-group {
     display: flex;
     align-items: center;
@@ -350,19 +349,22 @@
     bottom: -16px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 9px;
+    font-size: 10px;
     color: var(--text-muted);
     white-space: nowrap;
 }
 
 /* ---- Detail panel ---- */
 .detail-panel {
-    padding: 0 clamp(1rem, 5vw, 3rem) 2.5rem;
+    padding: 0 clamp(1.25rem, 5vw, 3rem) 2.5rem;
     background: var(--bg-base);
+    display: flex;
+    justify-content: center;
 }
 
 .detail-inner {
-    max-width: 100%;
+    width: 100%;
+    max-width: 860px;
     background: var(--bg-surface);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-soft);
@@ -418,22 +420,30 @@
 /* ---- Responsive ---- */
 @media (max-width: 768px) {
     .pblock {
-        width: 120px;
-        min-width: 120px;
+        width: 140px;
+        min-width: 140px;
     }
 
     .pblock-preview {
-        height: 44px;
+        height: 54px;
+    }
+
+    .pblock-name {
+        font-size: 12px;
+    }
+
+    .pblock-sub {
+        font-size: 9px;
     }
 
     .layer-block {
-        width: 38px;
-        min-width: 38px;
-        height: 50px;
+        width: 48px;
+        min-width: 48px;
+        height: 60px;
     }
 
     .layer-block-num {
-        font-size: 11px;
+        font-size: 13px;
     }
 
     .flow-conn {

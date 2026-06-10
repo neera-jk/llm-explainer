@@ -22,8 +22,8 @@ const BLOCK_LABELS = {
 const BLOCK_ACCENTS = {
   tokenizer: { color: '#888780', light: 'rgba(136,135,128,0.1)', border: 'rgba(136,135,128,0.25)', text: '#9c9a92' },
   embedding: { color: '#7F77DD', light: 'rgba(127,119,221,0.1)', border: 'rgba(127,119,221,0.3)', text: '#AFA9EC' },
-  unembed: { color: '#D85A30', light: 'rgba(216,90,48,0.1)', border: 'rgba(216,90,48,0.3)', text: '#F0997B' },
-  softmax: { color: '#1D9E75', light: 'rgba(29,158,117,0.1)', border: 'rgba(29,158,117,0.3)', text: '#5DCAA5' },
+  unembed: { color: '#b85428', light: 'rgba(184,84,40,0.1)', border: 'rgba(184,84,40,0.3)', text: '#d4896b' },
+  softmax: { color: '#1a8a65', light: 'rgba(26,138,101,0.1)', border: 'rgba(26,138,101,0.3)', text: '#4db896' },
 }
 
 export default function BlockDetail({ blockId, layerIndex, model, tokens, promptKey, onClose }) {

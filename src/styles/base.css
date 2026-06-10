@@ -13,72 +13,78 @@ body {
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: var(--font-sans);
     background: var(--bg-base);
     color: var(--text-primary);
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
 }
 
 .app {
     width: 100%;
+    min-height: 100vh;
 }
 
-/* ─── Navbar ─────────────────────────────────── */
+/* ---- Navbar ---- */
 .navbar {
     background: var(--bg-surface);
-    border-bottom: 0.5px solid var(--border-subtle);
-    padding: 0 2rem;
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0 clamp(1rem, 4vw, 2rem);
     display: flex;
     align-items: center;
-    height: 54px;
+    height: 52px;
     position: sticky;
     top: 0;
     z-index: 50;
+    backdrop-filter: blur(12px);
 }
 
 .nav-logo {
-    font-size: 15px;
-    font-weight: 500;
+    font-size: 14px;
+    font-weight: 600;
     color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: 8px;
+    letter-spacing: -0.01em;
 }
 
 .nav-logo-dot {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background: #7F77DD;
+    background: var(--accent-emb);
     flex-shrink: 0;
 }
 
 .nav-tag {
-    font-size: 11px;
+    font-size: 10px;
     color: #AFA9EC;
-    background: rgba(127, 119, 221, 0.15);
-    border: 0.5px solid rgba(127, 119, 221, 0.25);
-    padding: 2px 8px;
+    background: rgba(127, 119, 221, 0.12);
+    border: 1px solid rgba(127, 119, 221, 0.2);
+    padding: 2px 7px;
     border-radius: 20px;
-    margin-left: 6px;
+    margin-left: 4px;
+    font-weight: 500;
 }
 
 .nav-models {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     margin-left: auto;
 }
 
 .npill {
-    font-size: 12px;
-    padding: 5px 14px;
+    font-size: 11px;
+    padding: 5px 12px;
     border-radius: 20px;
-    border: 0.5px solid var(--border-subtle);
+    border: 1px solid var(--border-subtle);
     cursor: pointer;
     color: var(--text-muted);
     background: transparent;
-    transition: all 0.15s;
+    transition: all 0.2s ease;
     white-space: nowrap;
+    font-family: var(--font-sans);
 }
 
 .npill:hover {
@@ -87,32 +93,33 @@ body {
 }
 
 .npill-on {
-    background: rgba(127, 119, 221, 0.15);
-    border-color: rgba(127, 119, 221, 0.4);
+    background: rgba(127, 119, 221, 0.12);
+    border-color: rgba(127, 119, 221, 0.35);
     color: #AFA9EC;
     font-weight: 500;
 }
 
-/* ─── Intro strip ────────────────────────────── */
+/* ---- Intro strip ---- */
 .intro-strip {
     background: var(--bg-surface);
-    border-bottom: 0.5px solid var(--border-subtle);
-    padding: 1.25rem 5%;
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 1.25rem clamp(1rem, 5vw, 3rem);
 }
 
 .intro-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 2rem;
+    gap: 1.5rem;
     flex-wrap: wrap;
 }
 
 .intro-title {
-    font-size: 22px;
-    font-weight: 500;
+    font-size: 20px;
+    font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: 4px;
+    margin-bottom: 3px;
+    letter-spacing: -0.02em;
 }
 
 .intro-desc {
@@ -122,7 +129,7 @@ body {
 
 .intro-stats {
     display: flex;
-    gap: 2rem;
+    gap: 1.75rem;
     flex-shrink: 0;
 }
 
@@ -134,24 +141,26 @@ body {
 }
 
 .istat-val {
-    font-size: 22px;
-    font-weight: 500;
+    font-size: 20px;
+    font-weight: 600;
     color: var(--text-primary);
-    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-family: var(--font-mono);
+    letter-spacing: -0.02em;
 }
 
 .istat-label {
-    font-size: 10px;
+    font-size: 9px;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
+    font-weight: 500;
 }
 
-/* ─── Prompt bar ─────────────────────────────── */
+/* ---- Prompt bar ---- */
 .prompt-bar {
     background: var(--bg-base);
-    border-bottom: 0.5px solid var(--border-subtle);
-    padding: 1rem 5%;
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 1rem clamp(1rem, 5vw, 3rem);
 }
 
 .prompt-bar-inner {
@@ -161,30 +170,31 @@ body {
 }
 
 .prompt-label {
-    font-size: 10px;
+    font-size: 9px;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-weight: 500;
-    margin-bottom: 6px;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    margin-bottom: 4px;
 }
 
 .prompt-chips {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
 }
 
 .chip {
     font-size: 12px;
     padding: 6px 14px;
-    border-radius: 8px;
-    border: 0.5px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
     cursor: pointer;
     color: var(--text-muted);
     background: transparent;
-    transition: all 0.15s;
+    transition: all 0.2s ease;
     white-space: nowrap;
+    font-family: var(--font-sans);
 }
 
 .chip:hover {
@@ -193,8 +203,8 @@ body {
 }
 
 .chip-active {
-    background: rgba(127, 119, 221, 0.12);
-    border-color: rgba(127, 119, 221, 0.35);
+    background: rgba(127, 119, 221, 0.1);
+    border-color: rgba(127, 119, 221, 0.3);
     color: #AFA9EC;
     font-weight: 500;
 }
@@ -213,8 +223,8 @@ body {
 
 .tok-chip {
     background: var(--bg-surface);
-    border: 0.5px solid rgba(127, 119, 221, 0.2);
-    border-radius: 8px;
+    border: 1px solid rgba(127, 119, 221, 0.15);
+    border-radius: var(--radius-sm);
     padding: 5px 10px;
     display: flex;
     flex-direction: column;
@@ -236,15 +246,14 @@ body {
 
 .tok-id {
     font-size: 10px;
-    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-family: var(--font-mono);
     color: #534AB7;
 }
 
 .tok-id-label {
-    font-size: 9px;
+    font-size: 8px;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
 }
 
 .tok-hint {
@@ -252,7 +261,7 @@ body {
     color: var(--text-muted);
 }
 
-/* ─── Scrollbar ──────────────────────────────── */
+/* ---- Scrollbar ---- */
 ::-webkit-scrollbar {
     width: 4px;
     height: 4px;
@@ -265,4 +274,125 @@ body {
 ::-webkit-scrollbar-thumb {
     background: var(--border-soft);
     border-radius: 10px;
+}
+
+/* ---- Tooltip ---- */
+.tip-wrap {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+    border-bottom: 1px dashed var(--border-soft);
+}
+
+.tip-wrap:hover .tip-box,
+.tip-wrap:focus-within .tip-box {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.tip-box {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    width: max-content;
+    max-width: 220px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    font-size: 11px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    white-space: normal;
+    text-align: left;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.tip-box::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 7px;
+    height: 7px;
+    background: var(--bg-elevated);
+    border-left: 1px solid var(--border-soft);
+    border-top: 1px solid var(--border-soft);
+}
+
+/* Right-edge safety: when parent is near right side */
+.tip-wrap--right .tip-box {
+    left: auto;
+    right: 0;
+    transform: translateX(0) translateY(4px);
+}
+
+.tip-wrap--right:hover .tip-box,
+.tip-wrap--right:focus-within .tip-box {
+    transform: translateX(0) translateY(0);
+}
+
+.tip-wrap--right .tip-box::before {
+    left: auto;
+    right: 12px;
+    transform: rotate(45deg);
+}
+
+/* Left-edge safety */
+.tip-wrap--left .tip-box {
+    left: 0;
+    transform: translateX(0) translateY(4px);
+}
+
+.tip-wrap--left:hover .tip-box,
+.tip-wrap--left:focus-within .tip-box {
+    transform: translateX(0) translateY(0);
+}
+
+.tip-wrap--left .tip-box::before {
+    left: 12px;
+    transform: rotate(45deg);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+    .intro-stats {
+        gap: 1rem;
+    }
+
+    .istat-val {
+        font-size: 16px;
+    }
+
+    .intro-title {
+        font-size: 17px;
+    }
+
+    .npill {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .intro-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .intro-stats {
+        width: 100%;
+        justify-content: space-between;
+    }
 }

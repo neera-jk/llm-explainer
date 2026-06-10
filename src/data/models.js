@@ -1,7 +1,3 @@
-/**
- * Model registry — add a new model here and it automatically appears
- * in the navbar, pipeline shapes, and all block detail views.
- */
 export const MODEL_REGISTRY = {
     gpt2: {
         key: 'gpt2',
@@ -29,9 +25,9 @@ export const MODEL_REGISTRY = {
         n_layers: 32,
         head_dim: 128,
         vocab_size: 128256,
-        pos_encoding: 'RoPE — applied inside each attention layer',
+        pos_encoding: 'RoPE',
         norm_type: 'RMSNorm',
-        attn_type: 'Grouped Query Attention (GQA) — 32 Q heads, 8 KV heads',
+        attn_type: 'Grouped Query Attention (GQA)',
         ffn_activation: 'SwiGLU',
     },
     kimi: {
@@ -46,7 +42,7 @@ export const MODEL_REGISTRY = {
         vocab_size: 160000,
         n_experts: 384,
         n_active_experts: 8,
-        pos_encoding: 'RoPE — applied inside each attention layer',
+        pos_encoding: 'RoPE',
         norm_type: 'RMSNorm',
         attn_type: 'MLA (Multi-head Latent Attention)',
         ffn_activation: 'SwiGLU + MoE (384 experts, 8 active per token)',
@@ -56,10 +52,6 @@ export const MODEL_REGISTRY = {
 export const MODEL_KEYS = Object.keys(MODEL_REGISTRY)
 export const DEFAULT_MODEL = 'gpt2'
 
-/**
- * Deterministic pseudo-random embedding vector for a token ID.
- * Same ID always produces the same vector — for visualization only.
- */
 export function makeEmbeddingVector(tokenId, dims) {
     const vec = []
     for (let i = 0; i < dims; i++) {
@@ -69,10 +61,6 @@ export function makeEmbeddingVector(tokenId, dims) {
     return vec
 }
 
-/**
- * Converts raw logits to probabilities.
- * Temperature < 1 sharpens the distribution, > 1 flattens it.
- */
 export function softmax(logits, temperature = 1.0) {
     const scaled = logits.map(v => v / temperature)
     const max = Math.max(...scaled)

@@ -1,7 +1,3 @@
-/**
- * Sample prompts for the pipeline visualization.
- * Token IDs are GPT-2 BPE IDs used as representative values.
- */
 export const PROMPTS = {
     'The cat sat on': [
         { token: 'The', id: 464 },
@@ -27,10 +23,6 @@ export const PROMPTS = {
 export const PROMPT_KEYS = Object.keys(PROMPTS)
 export const DEFAULT_PROMPT = 'The cat sat on'
 
-/**
- * Approximate next-token logit values for each prompt.
- * Used for the unembed and softmax visualizations.
- */
 export const NEXT_TOKEN_PREDICTIONS = {
     'The cat sat on': [
         { token: 'mat', logit: 4.2 },

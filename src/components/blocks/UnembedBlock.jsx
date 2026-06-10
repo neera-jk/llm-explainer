@@ -1,4 +1,5 @@
 import { NEXT_TOKEN_PREDICTIONS } from '../../data/prompts'
+import Tooltip from '../Tooltip'
 
 export default function UnembedBlock({ model, tokens, promptKey, accent }) {
     const a = accent || { color: '#D85A30', light: 'rgba(216,90,48,0.1)', border: 'rgba(216,90,48,0.3)', text: '#F0997B' }
@@ -23,7 +24,7 @@ export default function UnembedBlock({ model, tokens, promptKey, accent }) {
                 ].map(s => (
                     <div key={s.label} className="stat-card" style={{ background: a.light, borderColor: a.border }}>
                         <span className="stat-val" style={{ color: a.text }}>{s.val}</span>
-                        <span className="stat-label">{s.label}</span>
+                        <Tooltip term={s.label}><span className="stat-label">{s.label}</span></Tooltip>
                     </div>
                 ))}
             </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NEXT_TOKEN_PREDICTIONS } from '../../data/prompts'
 import { softmax } from '../../data/models'
+import Tooltip from '../Tooltip'
 
 export default function SoftmaxBlock({ model, tokens, promptKey, accent }) {
     const a = accent || { color: '#1D9E75', light: 'rgba(29,158,117,0.1)', border: 'rgba(29,158,117,0.3)', text: '#5DCAA5' }
@@ -34,7 +35,7 @@ export default function SoftmaxBlock({ model, tokens, promptKey, accent }) {
                 ].map(s => (
                     <div key={s.label} className="stat-card" style={{ background: a.light, borderColor: a.border }}>
                         <span className="stat-val" style={{ color: a.text }}>{s.val}</span>
-                        <span className="stat-label">{s.label}</span>
+                        <Tooltip term={s.label}><span className="stat-label">{s.label}</span></Tooltip>
                     </div>
                 ))}
             </div>

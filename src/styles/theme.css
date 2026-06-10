@@ -1,34 +1,32 @@
 :root {
-    --bg-base: #16161a;
-    --bg-surface: #1e1e24;
-    --bg-elevated: #26262e;
-    --bg-overlay: #2e2e38;
+    --bg-base: #111114;
+    --bg-surface: #19191e;
+    --bg-elevated: #222228;
+    --bg-overlay: #2a2a32;
 
     --border-subtle: rgba(255, 255, 255, 0.06);
     --border-soft: rgba(255, 255, 255, 0.1);
     --border-medium: rgba(255, 255, 255, 0.16);
 
     --text-primary: #e8e6e0;
-    --text-secondary: #9c9a92;
-    --text-muted: #555552;
+    --text-secondary: #a09e96;
+    --text-muted: #5e5e5a;
 
     --accent-tok: #888780;
-    --accent-tok-light: rgba(136, 135, 128, 0.08);
-    --accent-tok-border: rgba(136, 135, 128, 0.2);
-
+    --accent-tok-light: rgba(136, 135, 128, 0.06);
     --accent-emb: #7F77DD;
-    --accent-emb-light: rgba(127, 119, 221, 0.08);
-    --accent-emb-border: rgba(127, 119, 221, 0.25);
-
+    --accent-emb-light: rgba(127, 119, 221, 0.06);
     --accent-xfmr: #BA7517;
-    --accent-xfmr-light: rgba(186, 117, 23, 0.08);
-    --accent-xfmr-border: rgba(186, 117, 23, 0.25);
-
+    --accent-xfmr-light: rgba(186, 117, 23, 0.06);
     --accent-unemb: #D85A30;
-    --accent-unemb-light: rgba(216, 90, 48, 0.08);
-    --accent-unemb-border: rgba(216, 90, 48, 0.25);
-
+    --accent-unemb-light: rgba(216, 90, 48, 0.06);
     --accent-sfmx: #1D9E75;
-    --accent-sfmx-light: rgba(29, 158, 117, 0.08);
-    --accent-sfmx-border: rgba(29, 158, 117, 0.25);
+    --accent-sfmx-light: rgba(29, 158, 117, 0.06);
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+
+    --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
 }

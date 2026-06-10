@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { makeEmbeddingVector } from '../../data/models'
+import Tooltip from '../Tooltip'
 
 const SHOW_DIMS = 32
 const TOP_DIMS = 10
@@ -44,7 +45,7 @@ export default function EmbeddingBlock({ model, tokens, accent }) {
                 ].map(s => (
                     <div key={s.label} className="stat-card" style={{ background: a.light, borderColor: a.border }}>
                         <span className="stat-val" style={{ color: a.text }}>{s.val}</span>
-                        <span className="stat-label">{s.label}</span>
+                        <Tooltip term={s.label}><span className="stat-label">{s.label}</span></Tooltip>
                     </div>
                 ))}
             </div>

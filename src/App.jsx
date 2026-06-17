@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { useModel } from './hooks/useModel'
-import { MODEL_REGISTRY, MODEL_KEYS } from './data/models'
 import { PROMPT_KEYS } from './data/prompts'
 import Pipeline from './components/Pipeline'
 import BlockDetail from './components/BlockDetail'
+import ModelSelector from './components/ModelSelector'
 import Tooltip from './components/Tooltip'
 
 import './styles/theme.css'
@@ -12,9 +12,10 @@ import './styles/base.css'
 import './styles/pipeline.css'
 import './styles/blocks.css'
 import './styles/transformer.css'
+import './styles/selector.css'
 
 export default function App() {
-  const { modelKey, setModelKey, model, promptKey, setPromptKey, tokens } = useModel()
+  const { modelKey, setModelKey, model, family, promptKey, setPromptKey, tokens } = useModel()
   const [activeBlock, setActiveBlock] = useState(null)
   const [activeLayer, setActiveLayer] = useState(null)
 
@@ -48,6 +49,14 @@ export default function App() {
     setActiveLayer(null)
   }
 
+  const headLabel = family.attn === 'GQA'
+    ? `${model.n_heads}/${model.n_kv_heads}`
+    : family.attn === 'MLA'
+      ? `${model.n_heads}`
+      : `${model.n_heads}`
+
+  const headTip = family.attn === 'GQA' ? 'heads' : 'heads'
+
   return (
     <div className="app">
       <nav className="navbar">
@@ -56,14 +65,7 @@ export default function App() {
           LLM Explainer
           <span className="nav-tag">visual</span>
         </span>
-        <div className="nav-models">
-          {MODEL_KEYS.map(k => (
-            <button key={k} className={`npill ${modelKey === k ? 'npill-on' : ''}`}
-              onClick={() => handleModelSwitch(k)}>
-              {MODEL_REGISTRY[k].label}
-            </button>
-          ))}
-        </div>
+        <ModelSelector modelKey={modelKey} onSelect={handleModelSwitch} />
       </nav>
 
       <div className="intro-strip">
@@ -75,8 +77,8 @@ export default function App() {
           <div className="intro-stats">
             {[
               { val: model.n_layers, label: 'layers', tip: 'layers' },
-              { val: model.d_model, label: 'dims', tip: 'dims' },
-              { val: model.n_heads, label: 'heads', tip: 'heads' },
+              { val: model.d_model.toLocaleString(), label: 'dims', tip: 'dims' },
+              { val: headLabel, label: family.attn === 'GQA' ? 'Q/KV heads' : 'heads', tip: headTip },
               { val: model.vocab_size.toLocaleString(), label: 'vocab', tip: 'vocab' },
             ].map(s => (
               <div key={s.label} className="istat">
@@ -132,7 +134,7 @@ export default function App() {
           <BlockDetail
             key={activeBlock === 'transformer' ? `layer-${activeLayer}` : activeBlock}
             blockId={activeBlock} layerIndex={activeLayer}
-            model={model} tokens={tokens} promptKey={promptKey}
+            model={model} family={family} tokens={tokens} promptKey={promptKey}
             onClose={handleClose}
           />
         )}

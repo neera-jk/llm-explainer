@@ -26,7 +26,7 @@ const BLOCK_ACCENTS = {
   softmax: { color: '#1a8a65', light: 'rgba(26,138,101,0.1)', border: 'rgba(26,138,101,0.3)', text: '#4db896' },
 }
 
-export default function BlockDetail({ blockId, layerIndex, model, tokens, promptKey, onClose }) {
+export default function BlockDetail({ blockId, layerIndex, model, family, tokens, promptKey, onClose }) {
   const isLayer = blockId === 'transformer'
   const accent = isLayer ? { color: '#BA7517', text: '#EF9F27' } : BLOCK_ACCENTS[blockId]
   const label = isLayer ? `Layer ${layerIndex}` : BLOCK_LABELS[blockId]
@@ -34,8 +34,7 @@ export default function BlockDetail({ blockId, layerIndex, model, tokens, prompt
 
   return (
     <motion.div className="detail-panel"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}>
       <div className="detail-inner">
@@ -48,9 +47,9 @@ export default function BlockDetail({ blockId, layerIndex, model, tokens, prompt
         </div>
         <div className="detail-body">
           {isLayer ? (
-            <TransformerBlock model={model} tokens={tokens} layerIndex={layerIndex} />
+            <TransformerBlock model={model} tokens={tokens} layerIndex={layerIndex} family={family} />
           ) : BlockContent ? (
-            <BlockContent model={model} tokens={tokens} promptKey={promptKey} accent={accent} />
+            <BlockContent model={model} family={family} tokens={tokens} promptKey={promptKey} accent={accent} />
           ) : null}
         </div>
       </div>

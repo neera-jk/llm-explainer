@@ -23,7 +23,6 @@ body {
 .app {
     width: 100%;
     min-height: 100vh;
-    zoom: 1.16;
 }
 
 /* ---- Navbar ---- */
@@ -69,37 +68,6 @@ body {
     font-weight: 500;
 }
 
-.nav-models {
-    display: flex;
-    gap: 4px;
-    margin-left: auto;
-}
-
-.npill {
-    font-size: 13px;
-    padding: 6px 16px;
-    border-radius: 20px;
-    border: 1px solid var(--border-subtle);
-    cursor: pointer;
-    color: var(--text-muted);
-    background: transparent;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-    font-family: var(--font-sans);
-}
-
-.npill:hover {
-    border-color: var(--border-soft);
-    color: var(--text-secondary);
-}
-
-.npill-on {
-    background: rgba(127, 119, 221, 0.12);
-    border-color: rgba(127, 119, 221, 0.35);
-    color: #AFA9EC;
-    font-weight: 500;
-}
-
 /* ---- Intro strip ---- */
 .intro-strip {
     background: var(--bg-surface);
@@ -124,7 +92,7 @@ body {
 }
 
 .intro-desc {
-    font-size: 14px;
+    font-size: 15px;
     color: var(--text-muted);
 }
 
@@ -150,7 +118,7 @@ body {
 }
 
 .istat-label {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -171,7 +139,7 @@ body {
 }
 
 .prompt-label {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -186,7 +154,7 @@ body {
 }
 
 .chip {
-    font-size: 14px;
+    font-size: 15px;
     padding: 8px 18px;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border-subtle);
@@ -234,7 +202,7 @@ body {
 }
 
 .tok-text {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 500;
     color: #AFA9EC;
 }
@@ -246,7 +214,7 @@ body {
 }
 
 .tok-id {
-    font-size: 12px;
+    font-size: 13px;
     font-family: var(--font-mono);
     color: #534AB7;
 }
@@ -258,7 +226,7 @@ body {
 }
 
 .tok-hint {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--text-muted);
 }
 
@@ -303,7 +271,7 @@ body {
     border: 1px solid var(--border-soft);
     border-radius: var(--radius-sm);
     padding: 8px 10px;
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1.55;
     color: var(--text-secondary);
     z-index: 100;
@@ -374,13 +342,12 @@ body {
         font-size: 14px;
     }
 
-    .npill {
-        font-size: 11px;
-        padding: 4px 10px;
-    }
-
     .intro-title {
         font-size: 18px;
+    }
+
+    .intro-desc {
+        font-size: 13px;
     }
 
     .intro-stats {
@@ -392,16 +359,16 @@ body {
     }
 
     .chip {
-        font-size: 12px;
+        font-size: 13px;
         padding: 6px 14px;
     }
 
     .tok-text {
-        font-size: 13px;
+        font-size: 14px;
     }
 
     .tok-id {
-        font-size: 10px;
+        font-size: 11px;
     }
 }
 

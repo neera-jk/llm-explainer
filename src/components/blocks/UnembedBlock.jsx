@@ -1,16 +1,17 @@
 import { NEXT_TOKEN_PREDICTIONS } from '../../data/prompts'
 import Tooltip from '../Tooltip'
 
-export default function UnembedBlock({ model, tokens, promptKey, accent }) {
+export default function UnembedBlock({ model, family, tokens, promptKey, accent }) {
     const a = accent || { color: '#b85428', light: 'rgba(184,84,40,0.1)', border: 'rgba(184,84,40,0.3)', text: '#d4896b' }
     const predictions = NEXT_TOKEN_PREDICTIONS[promptKey] || []
     const T = tokens.length
     const maxLogit = Math.max(...predictions.map(p => p.logit))
+    const topToken = predictions.length > 0 ? predictions.reduce((a, b) => a.logit > b.logit ? a : b) : null
 
     return (
         <div className="block-content">
             <p className="block-explain">
-                After passing through all the transformer layers, we have a <strong>[{T} x {model.d_model}]</strong> tensor.
+                After passing through all {model.n_layers} transformer layers, we have a <strong>[{T} x {model.d_model}]</strong> tensor.
                 The model now needs to convert its internal representation back into a prediction over
                 actual words. It does this by multiplying the <strong>last token's vector</strong> by
                 a large matrix <strong>[{model.d_model} x {model.vocab_size.toLocaleString()}]</strong>.
@@ -50,9 +51,9 @@ export default function UnembedBlock({ model, tokens, promptKey, accent }) {
 
             <p className="footnote">
                 Important: these logits are not probabilities. They can be any number, and they do not
-                add up to 1. The next step (Softmax) will convert them into actual probabilities. Right now
-                "mat" has the highest logit of 4.2, which means the model thinks "mat" is the most likely
-                next word after "{tokens[T - 1].token}".
+                add up to 1. The next step (Softmax) will convert them into actual probabilities.
+                {topToken ? ` Right now "${topToken.token}" has the highest logit of ${topToken.logit.toFixed(1)}, which means the model thinks "${topToken.token}" is the most likely next word after "${tokens[T - 1].token}".` : ''}
+                {' '}{model.label} produces {model.vocab_size.toLocaleString()} logits, one for every token in its vocabulary.
             </p>
         </div>
     )

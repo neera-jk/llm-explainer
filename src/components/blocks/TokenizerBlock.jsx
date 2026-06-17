@@ -1,7 +1,9 @@
 import Tooltip from '../Tooltip'
 
-export default function TokenizerBlock({ model, tokens, accent }) {
+export default function TokenizerBlock({ model, family, tokens, accent }) {
     const a = accent || { color: '#888780', light: 'rgba(136,135,128,0.1)', border: 'rgba(136,135,128,0.25)', text: '#9c9a92' }
+
+    const isGPT2 = family && family.key === 'gpt2'
 
     return (
         <div className="block-content">
@@ -50,9 +52,10 @@ export default function TokenizerBlock({ model, tokens, accent }) {
             </div>
 
             <p className="footnote">
-                GPT-2 uses Byte Pair Encoding (BPE) to build its vocabulary. It starts with individual characters
-                and keeps merging the most frequent adjacent pairs into new tokens. This means common words
-                like "the" become a single token, while rare or long words get split into smaller pieces.
+                {isGPT2
+                    ? `${model.label} uses Byte Pair Encoding (BPE) with a vocabulary of ${model.vocab_size.toLocaleString()} tokens, trained primarily on English web text. It starts with individual characters and keeps merging the most frequent adjacent pairs into new tokens. Common words like "the" become a single token, while rare or long words get split into smaller pieces.`
+                    : `${model.label} uses Byte Pair Encoding (BPE) with a much larger vocabulary of ${model.vocab_size.toLocaleString()} tokens, trained on multilingual data. The larger vocabulary means common words in many languages (not just English) get their own token instead of being split into many small pieces. This makes the model significantly more efficient at non-English text, at the cost of a larger embedding matrix.`
+                }
             </p>
         </div>
     )

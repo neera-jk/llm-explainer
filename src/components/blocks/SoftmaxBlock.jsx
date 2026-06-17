@@ -3,7 +3,7 @@ import { NEXT_TOKEN_PREDICTIONS } from '../../data/prompts'
 import { softmax } from '../../data/models'
 import Tooltip from '../Tooltip'
 
-export default function SoftmaxBlock({ model, tokens, promptKey, accent }) {
+export default function SoftmaxBlock({ model, family, tokens, promptKey, accent }) {
     const a = accent || { color: '#1a8a65', light: 'rgba(26,138,101,0.1)', border: 'rgba(26,138,101,0.3)', text: '#4db896' }
     const [temperature, setTemperature] = useState(1.0)
     const [topK, setTopK] = useState(5)
@@ -12,6 +12,7 @@ export default function SoftmaxBlock({ model, tokens, promptKey, accent }) {
     const probs = softmax(predictions.map(p => p.logit), temperature)
     const ranked = predictions.map((p, i) => ({ ...p, prob: probs[i] })).sort((x, y) => y.prob - x.prob)
     const topKSet = new Set(ranked.slice(0, topK).map(p => p.token))
+    const topToken = ranked[0]
 
     function tempNote() {
         if (temperature < 0.7) return 'Very low: the model will almost always pick the single most likely token. Output becomes very predictable and repetitive.'
@@ -32,19 +33,20 @@ export default function SoftmaxBlock({ model, tokens, promptKey, accent }) {
     return (
         <div className="block-content">
             <p className="block-explain">
-                The previous step produced raw scores (logits) for every token in the vocabulary. But
-                those scores can be any number and they do not add up to anything meaningful.
-                Softmax fixes this by converting them into <strong>probabilities that always sum
-                    to 1.0</strong> (or 100%). A logit of 4.2 for "mat" might become a 38% probability.
-                Two controls let you adjust how the model picks its next token: <strong>temperature</strong> scales
+                The previous step produced {model.vocab_size.toLocaleString()} raw scores (logits), one for every token
+                in {model.label}'s vocabulary. But those scores can be any number and they do not add up to
+                anything meaningful. Softmax fixes this by converting them into <strong>probabilities
+                    that always sum to 1.0</strong> (or 100%).
+                {topToken ? ` A logit of ${topToken.logit.toFixed(1)} for "${topToken.token}" becomes a ${(topToken.prob * 100).toFixed(0)}% probability.` : ''}
+                {' '}Two controls let you adjust how the model picks its next token: <strong>temperature</strong> scales
                 the logits before softmax (lower = more confident, higher = more random),
                 and <strong>top-k</strong> limits sampling to only the K most likely tokens.
             </p>
 
             <div className="stats-row">
                 {[
-                    { val: `${(ranked[0]?.prob * 100).toFixed(1)}%`, label: 'top token prob' },
-                    { val: ranked[0]?.token, label: 'most likely next' },
+                    { val: `${(topToken?.prob * 100).toFixed(1)}%`, label: 'top token prob' },
+                    { val: topToken?.token, label: 'most likely next' },
                     { val: temperature.toFixed(1), label: 'temperature' },
                 ].map(s => (
                     <div key={s.label} className="stat-card" style={{ background: a.light, borderColor: a.border }}>
@@ -129,7 +131,7 @@ export default function SoftmaxBlock({ model, tokens, promptKey, accent }) {
             </div>
 
             <p className="footnote">
-                At temperature 1.0, the model randomly samples from this distribution, so it will not
+                At temperature 1.0, {model.label} randomly samples from this distribution, so it will not
                 always pick the top token. Lowering temperature toward 0 makes the model always pick the
                 most likely token (greedy decoding). Raising it makes the distribution flatter, giving
                 less likely tokens a better chance of being selected.

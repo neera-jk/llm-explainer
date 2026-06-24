@@ -1,12 +1,11 @@
-import { NEXT_TOKEN_PREDICTIONS } from '../../data/prompts'
 import Tooltip from '../Tooltip'
 
-export default function UnembedBlock({ model, family, tokens, promptKey, accent }) {
+export default function UnembedBlock({ model, family, tokens, predictions, accent }) {
     const a = accent || { color: '#b85428', light: 'rgba(184,84,40,0.1)', border: 'rgba(184,84,40,0.3)', text: '#d4896b' }
-    const predictions = NEXT_TOKEN_PREDICTIONS[promptKey] || []
+    const preds = predictions || []
     const T = tokens.length
-    const maxLogit = Math.max(...predictions.map(p => p.logit))
-    const topToken = predictions.length > 0 ? predictions.reduce((a, b) => a.logit > b.logit ? a : b) : null
+    const maxLogit = preds.length > 0 ? Math.max(...preds.map(p => p.logit)) : 1
+    const topToken = preds.length > 0 ? preds.reduce((a, b) => a.logit > b.logit ? a : b) : null
 
     return (
         <div className="block-content">
@@ -38,7 +37,7 @@ export default function UnembedBlock({ model, family, tokens, promptKey, accent 
                 <span className="section-note">raw scores, not probabilities yet</span>
             </h3>
             <div className="bar-chart">
-                {predictions.map(({ token, logit }) => (
+                {preds.map(({ token, logit }) => (
                     <div key={token} className="bar-row">
                         <span className="bar-label" style={{ width: 64 }}>{token}</span>
                         <div className="bar-track">
@@ -52,7 +51,7 @@ export default function UnembedBlock({ model, family, tokens, promptKey, accent 
             <p className="footnote">
                 Important: these logits are not probabilities. They can be any number, and they do not
                 add up to 1. The next step (Softmax) will convert them into actual probabilities.
-                {topToken ? ` Right now "${topToken.token}" has the highest logit of ${topToken.logit.toFixed(1)}, which means the model thinks "${topToken.token}" is the most likely next word after "${tokens[T - 1].token}".` : ''}
+                {topToken ? ` Right now "${topToken.token}" has the highest logit of ${topToken.logit.toFixed(1)}, which means ${model.label} thinks "${topToken.token}" is the most likely next word after "${tokens[T - 1].token}".` : ''}
                 {' '}{model.label} produces {model.vocab_size.toLocaleString()} logits, one for every token in its vocabulary.
             </p>
         </div>

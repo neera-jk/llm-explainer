@@ -1,16 +1,15 @@
 import { useState } from 'react'
-import { NEXT_TOKEN_PREDICTIONS } from '../../data/prompts'
 import { softmax } from '../../data/models'
 import Tooltip from '../Tooltip'
 
-export default function SoftmaxBlock({ model, family, tokens, promptKey, accent }) {
+export default function SoftmaxBlock({ model, family, tokens, predictions, accent }) {
     const a = accent || { color: '#1a8a65', light: 'rgba(26,138,101,0.1)', border: 'rgba(26,138,101,0.3)', text: '#4db896' }
     const [temperature, setTemperature] = useState(1.0)
     const [topK, setTopK] = useState(5)
 
-    const predictions = NEXT_TOKEN_PREDICTIONS[promptKey] || []
-    const probs = softmax(predictions.map(p => p.logit), temperature)
-    const ranked = predictions.map((p, i) => ({ ...p, prob: probs[i] })).sort((x, y) => y.prob - x.prob)
+    const preds = predictions || []
+    const probs = softmax(preds.map(p => p.logit), temperature)
+    const ranked = preds.map((p, i) => ({ ...p, prob: probs[i] })).sort((x, y) => y.prob - x.prob)
     const topKSet = new Set(ranked.slice(0, topK).map(p => p.token))
     const topToken = ranked[0]
 
@@ -45,8 +44,8 @@ export default function SoftmaxBlock({ model, family, tokens, promptKey, accent 
 
             <div className="stats-row">
                 {[
-                    { val: `${(topToken?.prob * 100).toFixed(1)}%`, label: 'top token prob' },
-                    { val: topToken?.token, label: 'most likely next' },
+                    { val: topToken ? `${(topToken.prob * 100).toFixed(1)}%` : '-', label: 'top token prob' },
+                    { val: topToken?.token || '-', label: 'most likely next' },
                     { val: temperature.toFixed(1), label: 'temperature' },
                 ].map(s => (
                     <div key={s.label} className="stat-card" style={{ background: a.light, borderColor: a.border }}>
@@ -85,11 +84,11 @@ export default function SoftmaxBlock({ model, family, tokens, promptKey, accent 
                     <label className="control-label">top-k</label>
                     <div className="step-slider">
                         <div className="step-track">
-                            <input type="range" min="1" max={predictions.length} step="1"
+                            <input type="range" min="1" max={preds.length || 1} step="1"
                                 value={topK}
                                 onChange={e => setTopK(parseInt(e.target.value))}
                                 className="step-input" />
-                            {Array.from({ length: predictions.length }, (_, i) => (
+                            {Array.from({ length: preds.length }, (_, i) => (
                                 <div key={i}
                                     className={`step-seg ${i < topK ? 'step-seg-on' : ''}`}
                                     style={i < topK ? { background: a.color, borderColor: 'transparent' } : {}}
@@ -98,8 +97,8 @@ export default function SoftmaxBlock({ model, family, tokens, promptKey, accent 
                         </div>
                         <div className="step-labels">
                             <span className="step-label">1</span>
-                            <span className="step-label">{Math.ceil(predictions.length / 2)}</span>
-                            <span className="step-label">{predictions.length}</span>
+                            <span className="step-label">{Math.ceil(preds.length / 2)}</span>
+                            <span className="step-label">{preds.length}</span>
                         </div>
                     </div>
                     <span className="control-val">{topK}</span>

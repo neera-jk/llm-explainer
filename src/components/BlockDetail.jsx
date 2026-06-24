@@ -26,7 +26,7 @@ const BLOCK_ACCENTS = {
   softmax: { color: '#1a8a65', light: 'rgba(26,138,101,0.1)', border: 'rgba(26,138,101,0.3)', text: '#4db896' },
 }
 
-export default function BlockDetail({ blockId, layerIndex, model, family, tokens, promptKey, onClose }) {
+export default function BlockDetail({ blockId, layerIndex, model, family, tokens, predictions, promptKey, onClose }) {
   const isLayer = blockId === 'transformer'
   const accent = isLayer ? { color: '#BA7517', text: '#EF9F27' } : BLOCK_ACCENTS[blockId]
   const label = isLayer ? `Layer ${layerIndex}` : BLOCK_LABELS[blockId]
@@ -49,7 +49,7 @@ export default function BlockDetail({ blockId, layerIndex, model, family, tokens
           {isLayer ? (
             <TransformerBlock model={model} tokens={tokens} layerIndex={layerIndex} family={family} />
           ) : BlockContent ? (
-            <BlockContent model={model} family={family} tokens={tokens} promptKey={promptKey} accent={accent} />
+            <BlockContent model={model} family={family} tokens={tokens} predictions={predictions} promptKey={promptKey} accent={accent} />
           ) : null}
         </div>
       </div>

@@ -52,21 +52,11 @@ function ArchBrace() {
     )
 }
 
-function SkipBlock({ children, label, color, isActive, onClick, badge }) {
+function AddCircle({ tipText }) {
     return (
-        <div className="lf-skip-wrap">
-            <span className="lf-skip-label">{label}</span>
-            <div className="lf-skip-track">
-                <div style={{ position: 'relative' }}>
-                    {badge && <span className="lf-rope-badge">{badge}</span>}
-                    <div
-                        className={`lf-node lf-node--${color} ${isActive ? 'lf-node--active' : ''}`}
-                        onClick={onClick}
-                    >
-                        {children}
-                    </div>
-                </div>
-            </div>
+        <div className="lf-add">
+            +
+            <span className="lf-add-tip">{tipText}</span>
         </div>
     )
 }
@@ -96,7 +86,6 @@ function AttentionArch({ model, fam, T }) {
                     <div className="arch-fan-item arch-fan-item--k">K <span className="arch-fan-dim">{kvHeads} x {model.head_dim}d</span></div>
                     <div className="arch-fan-item arch-fan-item--v">V <span className="arch-fan-dim">{kvHeads} x {model.head_dim}d</span></div>
                 </div>
-
                 {hasRoPE && (
                     <>
                         <ArchArrow color="lf-pulse--purple" />
@@ -106,7 +95,6 @@ function AttentionArch({ model, fam, T }) {
                         </div>
                     </>
                 )}
-
                 <ArchArrow color="lf-pulse--purple" />
                 <div className="arch-node arch-node--amber">
                     <span className="arch-node-title">Q x K^T</span>
@@ -166,7 +154,6 @@ function FFNArch({ model, fam, T }) {
                     <span className="arch-node-sub">[{T}x{model.d_model}]</span>
                 </div>
                 <ArchArrow color="lf-pulse--amber" />
-
                 {isMoE && (
                     <>
                         <div className="arch-node" style={{ height: 52, borderColor: 'rgba(26,138,101,0.3)', background: 'rgba(26,138,101,0.06)' }}>
@@ -176,7 +163,6 @@ function FFNArch({ model, fam, T }) {
                         <ArchArrow color="lf-pulse--amber" />
                     </>
                 )}
-
                 {isSwiGLU ? (
                     <>
                         <div className="arch-fan">
@@ -208,7 +194,6 @@ function FFNArch({ model, fam, T }) {
                         </div>
                     </>
                 )}
-
                 <ArchArrow color="lf-pulse--amber" />
                 <div className="arch-node" style={{ height: 52 }}>
                     <span className="arch-node-title">W_down</span>
@@ -227,8 +212,8 @@ function FFNArch({ model, fam, T }) {
             </div>
             <p className="arch-hint">
                 {isSwiGLU
-                    ? `SwiGLU uses three weight matrices instead of two. W_gate and W_up project in parallel, then the gate output (after swish activation) controls which features from W_up pass through. This learned gating makes the FFN more expressive.`
-                    : `Standard FFN: expand to ${model.d_ff} dimensions with W_up, apply GELU activation (smoothly kills negative values), then compress back to ${model.d_model} with W_down.`
+                    ? `SwiGLU uses three weight matrices instead of two. W_gate and W_up project in parallel, then the gate output (after swish activation) controls which features from W_up pass through.`
+                    : `Standard FFN: expand to ${model.d_ff} dimensions with W_up, apply GELU activation, then compress back to ${model.d_model} with W_down.`
                 }
                 {isMoE ? ` With MoE, each token is routed to only ${model.n_active_experts} of ${model.n_experts} available expert FFNs. Massive total capacity, but only a fraction runs per token.` : ''}
             </p>
@@ -274,9 +259,11 @@ export default function TransformerBlock({ model, tokens, layerIndex, family }) 
                 Then <strong>{attnLabel}</strong> lets every token look at every other token to gather context.
                 {fam.attn === 'GQA' ? ` In GQA, groups of ${model.n_heads / model.n_kv_heads} query heads share the same key and value, making the KV cache ${model.n_heads / model.n_kv_heads}x smaller.` : ''}
                 {fam.posEncoding === 'rope' ? ' RoPE (Rotary Position Embeddings) is applied inside attention to encode where each token sits in the sequence.' : ''}
-                {' '}The original input is added back via a residual connection (shown as "skip" above the block).
+                {' '}The highlighted zones show <strong>residual connections</strong>: the original input
+                is added back to the sub-block's output at the "+" circle. This helps the model train
+                by giving gradients a shortcut through the network.
                 Then another {fam.norm}, followed by the <strong>{ffnLabel}</strong>
-                {fam.ffn.includes('SwiGLU') && !isMoE ? ' which uses a gating mechanism with three weight matrices instead of the simpler two-matrix GELU approach' : ''}
+                {fam.ffn.includes('SwiGLU') && !isMoE ? ' which uses a gating mechanism with three weight matrices' : ''}
                 {isMoE ? ` where a router sends each token to ${model.n_active_experts} of ${model.n_experts} expert networks` : ''}.
                 Another residual add, and the output has the same shape: <strong>[{T} x {model.d_model}]</strong>.
             </p>
@@ -288,38 +275,40 @@ export default function TransformerBlock({ model, tokens, layerIndex, family }) 
                     <div className="lf-node">{fam.norm}<sub>normalize</sub></div>
                     <FlowArrow color="lf-pulse--purple" />
 
-                    <SkipBlock
-                        label="skip (residual)"
-                        color="attn"
-                        isActive={activeSubBlock === 'attn'}
-                        onClick={() => handleSubClick('attn')}
-                        badge={fam.posEncoding === 'rope' ? '+ RoPE' : null}
-                    >
-                        {attnLabel}<sub>{attnSub}</sub>
-                    </SkipBlock>
+                    <div className="lf-residual-zone lf-residual-zone--attn">
+                        <div style={{ position: 'relative' }}>
+                            {fam.posEncoding === 'rope' && <span className="lf-rope-badge">+ RoPE</span>}
+                            <div
+                                className={`lf-node lf-node--attn ${activeSubBlock === 'attn' ? 'lf-node--active' : ''}`}
+                                onClick={() => handleSubClick('attn')}
+                            >
+                                {attnLabel}<sub>{attnSub}</sub>
+                            </div>
+                        </div>
+                        <PlainArrow />
+                        <AddCircle tipText="adds the original input back (residual connection)" />
+                    </div>
 
-                    <PlainArrow />
-                    <div className="lf-add">+</div>
                     <FlowArrow color="lf-pulse--amber" />
                     <div className="lf-node">{fam.norm}<sub>normalize</sub></div>
                     <FlowArrow color="lf-pulse--amber" />
 
-                    <SkipBlock
-                        label="skip (residual)"
-                        color="ffn"
-                        isActive={activeSubBlock === 'ffn'}
-                        onClick={() => handleSubClick('ffn')}
-                    >
-                        {ffnLabel}<sub>{ffnSub}</sub>
-                    </SkipBlock>
+                    <div className="lf-residual-zone lf-residual-zone--ffn">
+                        <div
+                            className={`lf-node lf-node--ffn ${activeSubBlock === 'ffn' ? 'lf-node--active' : ''}`}
+                            onClick={() => handleSubClick('ffn')}
+                        >
+                            {ffnLabel}<sub>{ffnSub}</sub>
+                        </div>
+                        <PlainArrow />
+                        <AddCircle tipText="adds the original input back (residual connection)" />
+                    </div>
 
-                    <PlainArrow />
-                    <div className="lf-add">+</div>
                     <PlainArrow />
                     <div className="lf-node lf-node--io">output<sub>[{T}x{model.d_model}]</sub></div>
                 </div>
             </div>
-            <p className="layer-flow-hint">data flows left to right. "skip" labels show residual connections that add the original input back after each sub-block. click the colored blocks to see inside.</p>
+            <p className="layer-flow-hint">data flows left to right. the shaded zones are residual connections. hover the "+" to learn more. click the colored blocks to see inside.</p>
 
             <AnimatePresence mode="wait">
                 {activeSubBlock && (
@@ -357,7 +346,7 @@ export default function TransformerBlock({ model, tokens, layerIndex, family }) 
                                 <motion.div key={activeTab}
                                     initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
-                                    {activeTab === 'main' && activeSubBlock === 'attn' && <AttentionDetail T={T} model={model} family={fam} />}
+                                    {activeTab === 'main' && activeSubBlock === 'attn' && <AttentionDetail T={T} model={model} family={fam} tokens={tokens} />}
                                     {activeTab === 'main' && activeSubBlock === 'ffn' && <FFNDetail T={T} model={model} family={fam} />}
                                     {activeTab === 'matmul' && <MatmulViz />}
                                 </motion.div>

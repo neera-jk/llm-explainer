@@ -15,7 +15,7 @@ import './styles/transformer.css'
 import './styles/selector.css'
 
 export default function App() {
-  const { modelKey, setModelKey, model, family, promptKey, setPromptKey, tokens } = useModel()
+  const { modelKey, setModelKey, model, family, promptKey, setPromptKey, tokens, predictions } = useModel()
   const [activeBlock, setActiveBlock] = useState(null)
   const [activeLayer, setActiveLayer] = useState(null)
 
@@ -51,11 +51,7 @@ export default function App() {
 
   const headLabel = family.attn === 'GQA'
     ? `${model.n_heads}/${model.n_kv_heads}`
-    : family.attn === 'MLA'
-      ? `${model.n_heads}`
-      : `${model.n_heads}`
-
-  const headTip = family.attn === 'GQA' ? 'heads' : 'heads'
+    : `${model.n_heads}`
 
   return (
     <div className="app">
@@ -78,7 +74,7 @@ export default function App() {
             {[
               { val: model.n_layers, label: 'layers', tip: 'layers' },
               { val: model.d_model.toLocaleString(), label: 'dims', tip: 'dims' },
-              { val: headLabel, label: family.attn === 'GQA' ? 'Q/KV heads' : 'heads', tip: headTip },
+              { val: headLabel, label: family.attn === 'GQA' ? 'Q/KV heads' : 'heads', tip: 'heads' },
               { val: model.vocab_size.toLocaleString(), label: 'vocab', tip: 'vocab' },
             ].map(s => (
               <div key={s.label} className="istat">
@@ -117,7 +113,7 @@ export default function App() {
                   </div>
                 </div>
               ))}
-              <span className="tok-hint">each word maps to an integer ID from the vocabulary</span>
+              <span className="tok-hint">token IDs are specific to {model.label}'s tokenizer</span>
             </div>
           </div>
         </div>
@@ -134,7 +130,8 @@ export default function App() {
           <BlockDetail
             key={activeBlock === 'transformer' ? `layer-${activeLayer}` : activeBlock}
             blockId={activeBlock} layerIndex={activeLayer}
-            model={model} family={family} tokens={tokens} promptKey={promptKey}
+            model={model} family={family} tokens={tokens}
+            predictions={predictions} promptKey={promptKey}
             onClose={handleClose}
           />
         )}

@@ -15,9 +15,7 @@ const WEIGHTS = [
     [18, 24, 16, 42],
 ]
 
-const TOKENS = ['The', 'cat', 'sat', 'on']
-
-export default function AttentionDetail({ T, model, family }) {
+export default function AttentionDetail({ T, model, family, tokens }) {
     const [step, setStep] = useState(0)
 
     const isGQA = family && family.attn === 'GQA'
@@ -25,6 +23,9 @@ export default function AttentionDetail({ T, model, family }) {
     const hasRoPE = family && family.posEncoding === 'rope'
     const kvHeads = model.n_kv_heads || model.n_heads
     const groupSize = isGQA ? model.n_heads / kvHeads : 1
+
+    const tokenNames = tokens ? tokens.map(t => t.token) : ['The', 'cat', 'sat', 'on']
+    const displayTokens = tokenNames.slice(0, 4)
 
     const steps = [
         {
@@ -35,15 +36,15 @@ export default function AttentionDetail({ T, model, family }) {
         },
         {
             title: 'Step 2: compute attention scores (Q x K^T)',
-            desc: `Each token's Query is compared against every Key via a dot product (multiply matching numbers and sum them up). This produces a ${T}x${T} grid of scores. A high score at row "sat", column "cat" means the token "sat" should pay a lot of attention to "cat". The scores are divided by ${Math.round(Math.sqrt(model.head_dim))} (the square root of ${model.head_dim}) to prevent them from growing too large, which would cause problems in the next step.`,
+            desc: `Each token's Query is compared against every Key via a dot product (multiply matching numbers and sum them up). This produces a ${T}x${T} grid of scores. A high score at row "${displayTokens[2] || 'sat'}", column "${displayTokens[1] || 'cat'}" means the token "${displayTokens[2] || 'sat'}" should pay a lot of attention to "${displayTokens[1] || 'cat'}". The scores are divided by ${Math.round(Math.sqrt(model.head_dim))} (the square root of ${model.head_dim}) to prevent them from growing too large.`,
         },
         {
             title: 'Step 3: softmax turns scores into weights',
-            desc: `The raw scores from step 2 are converted into probabilities using softmax, so each row sums to 100%. Now we can read this as: "sat" pays 48% of its attention to itself, 35% to "cat" (the subject it describes), 8% to "The", and 9% to "on". The model learned these patterns during training by seeing millions of sentences where verbs attend to their subjects.`,
+            desc: `The raw scores are converted into probabilities using softmax, so each row sums to 100%. Now we can read this as: "${displayTokens[2] || 'sat'}" pays 48% of its attention to itself, 35% to "${displayTokens[1] || 'cat'}" (the subject it describes), 8% to "${displayTokens[0] || 'The'}", and 9% to "${displayTokens[3] || 'on'}". The model learned these patterns during training by seeing millions of sentences.`,
         },
         {
             title: 'Step 4: weights x V = context-aware output',
-            desc: `Finally, each token's output is computed as a weighted mix of all Value vectors, using the attention weights from step 3. So "sat"'s output becomes 48% of its own Value + 35% of "cat"'s Value + the rest from other tokens. This means "sat" now carries information about the tokens it attended to. This process runs independently for all ${model.n_heads} Q heads${isGQA ? ` (sharing ${kvHeads} K/V heads)` : ''}. Their outputs are concatenated (joined side by side) and projected back to ${model.d_model} dimensions.`,
+            desc: `Each token's output is a weighted mix of all Value vectors. So "${displayTokens[2] || 'sat'}"'s output becomes 48% of its own Value + 35% of "${displayTokens[1] || 'cat'}"'s Value + the rest from other tokens. This runs for all ${model.n_heads} Q heads${isGQA ? ` (sharing ${kvHeads} K/V heads)` : ''}. Their outputs are concatenated and projected back to ${model.d_model} dimensions.`,
         },
     ]
 
@@ -79,17 +80,17 @@ export default function AttentionDetail({ T, model, family }) {
                             </motion.div>
                             <span className="qkv-arrow">x W =</span>
                             <motion.div className="qkv-box" style={{ background: 'rgba(127,119,221,0.12)', border: '1px solid rgba(127,119,221,0.35)' }}
-                                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}>
+                                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.35 }}>
                                 <span className="qkv-label" style={{ color: '#7F77DD' }}>Q</span>
                                 <span className="qkv-dim" style={{ color: '#7F77DD' }}>{model.n_heads} x [{T}x{model.head_dim}]</span>
                             </motion.div>
                             <motion.div className="qkv-box" style={{ background: 'rgba(26,138,101,0.1)', border: '1px solid rgba(26,138,101,0.3)' }}
-                                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}>
+                                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.35 }}>
                                 <span className="qkv-label" style={{ color: '#1a8a65' }}>K</span>
                                 <span className="qkv-dim" style={{ color: '#1a8a65' }}>{kvHeads} x [{T}x{model.head_dim}]</span>
                             </motion.div>
                             <motion.div className="qkv-box" style={{ background: 'rgba(186,117,23,0.1)', border: '1px solid rgba(186,117,23,0.3)' }}
-                                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}>
+                                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.35 }}>
                                 <span className="qkv-label" style={{ color: '#BA7517' }}>V</span>
                                 <span className="qkv-dim" style={{ color: '#BA7517' }}>{kvHeads} x [{T}x{model.head_dim}]</span>
                             </motion.div>
@@ -104,13 +105,13 @@ export default function AttentionDetail({ T, model, family }) {
 
                     {step === 1 && (
                         <div style={{ textAlign: 'center' }}>
-                            <div className="attn-matrix" style={{ gridTemplateColumns: '50px repeat(4, 48px)' }}>
+                            <div className="attn-matrix" style={{ gridTemplateColumns: `50px repeat(${displayTokens.length}, 48px)` }}>
                                 <div />
-                                {TOKENS.map((t, i) => <div key={i} className="attn-header">{t}</div>)}
-                                {TOKENS.map((t, ri) => (
+                                {displayTokens.map((t, i) => <div key={i} className="attn-header">{t}</div>)}
+                                {displayTokens.map((t, ri) => (
                                     <div key={ri} style={{ display: 'contents' }}>
                                         <div className="attn-header" style={{ textAlign: 'right', paddingRight: 6 }}>{t}</div>
-                                        {SCORES[ri].map((s, ci) => {
+                                        {SCORES[ri].slice(0, displayTokens.length).map((s, ci) => {
                                             const intensity = s / 2.5 * 0.5
                                             return (
                                                 <motion.div key={ci} className="attn-cell"
@@ -130,15 +131,15 @@ export default function AttentionDetail({ T, model, family }) {
 
                     {step === 2 && (
                         <div style={{ textAlign: 'center' }}>
-                            <div className="attn-matrix" style={{ gridTemplateColumns: '50px repeat(4, 52px)' }}>
+                            <div className="attn-matrix" style={{ gridTemplateColumns: `50px repeat(${displayTokens.length}, 52px)` }}>
                                 <div />
-                                {TOKENS.map((t, i) => <div key={i} className="attn-header">{t}</div>)}
-                                {TOKENS.map((t, ri) => (
+                                {displayTokens.map((t, i) => <div key={i} className="attn-header">{t}</div>)}
+                                {displayTokens.map((t, ri) => (
                                     <div key={ri} style={{ display: 'contents' }}>
                                         <div className="attn-header" style={{ textAlign: 'right', paddingRight: 6 }}>{t}</div>
-                                        {WEIGHTS[ri].map((w, ci) => {
+                                        {WEIGHTS[ri].slice(0, displayTokens.length).map((w, ci) => {
                                             const intensity = w / 50 * 0.55
-                                            const isMax = w === Math.max(...WEIGHTS[ri])
+                                            const isMax = w === Math.max(...WEIGHTS[ri].slice(0, displayTokens.length))
                                             return (
                                                 <motion.div key={ci} className="attn-cell"
                                                     style={{ height: 48, background: `rgba(127,119,221,${intensity})`, color: intensity > 0.3 ? '#e8e6e0' : '#AFA9EC', fontWeight: isMax ? 600 : 400 }}
@@ -174,7 +175,7 @@ export default function AttentionDetail({ T, model, family }) {
                                 <rect x="318" y="34" width="56" height="32" rx="4" fill="rgba(127,119,221,0.08)" stroke="rgba(127,119,221,0.25)" strokeWidth="0.5" />
                                 <text x="346" y="54" fontSize="9" fill="#AFA9EC" textAnchor="middle" fontFamily="var(--font-mono)">[{T}x{model.d_model}]</text>
                             </svg>
-                            <p className="attn-note">{model.n_heads} Q heads{isGQA ? `, ${kvHeads} KV heads` : ''} of {model.head_dim} dimensions each, concatenated back to {model.d_model} dimensions. Same shape as input.</p>
+                            <p className="attn-note">{model.n_heads} Q heads{isGQA ? `, ${kvHeads} KV heads` : ''} of {model.head_dim} dimensions each, concatenated back to {model.d_model} dimensions.</p>
                         </div>
                     )}
                 </motion.div>

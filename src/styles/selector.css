@@ -51,6 +51,8 @@
     border-radius: var(--radius-md);
     z-index: 200;
     overflow: hidden;
+    max-height: 480px;
+    overflow-y: auto;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-4px);
@@ -153,6 +155,18 @@
     background: #7F77DD;
 }
 
-.sel-dot--moe {
+.sel-dot--mixtral {
+    background: #E76F51;
+}
+
+.sel-dot--deepseek {
     background: #BA7517;
+}
+
+.sel-dot--qwen {
+    background: #2A9D8F;
+}
+
+.sel-dot--llama4 {
+    background: #E9C46A;
 }

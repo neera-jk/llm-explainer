@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { getFamily, getFFNLabel } from '../data/models'
 
 function getShape(blockId, tokens, model) {
     const T = tokens.length
@@ -48,15 +49,18 @@ function EmbeddingPreview({ tokens }) {
     )
 }
 
-function UnembedPreview() {
+function UnembedPreview({ model }) {
+    const vocabLabel = model.vocab_size >= 1000
+        ? `${Math.round(model.vocab_size / 1000)}K`
+        : `${model.vocab_size}`
     return (
         <svg viewBox="0 0 110 48" width="110" height="48">
             <rect x="2" y="12" width="26" height="24" rx="3" fill="rgba(184,84,40,0.12)" stroke="rgba(184,84,40,0.35)" strokeWidth="0.5" />
-            <text x="15" y="26" fontSize="7.5" fill="#b85428" textAnchor="middle" fontFamily="monospace">768</text>
+            <text x="15" y="26" fontSize="7.5" fill="#b85428" textAnchor="middle" fontFamily="monospace">{model.d_model}</text>
             <line x1="30" y1="24" x2="44" y2="24" stroke="#b85428" strokeWidth="1" />
             <polygon points="42,21 48,24 42,27" fill="#b85428" />
             <rect x="50" y="5" width="52" height="38" rx="3" fill="rgba(184,84,40,0.08)" stroke="#b85428" strokeWidth="0.6" />
-            <text x="76" y="22" fontSize="7" fill="#b85428" textAnchor="middle" fontFamily="monospace">50,257</text>
+            <text x="76" y="22" fontSize="7" fill="#b85428" textAnchor="middle" fontFamily="monospace">{vocabLabel}</text>
             <text x="76" y="32" fontSize="6" fill="rgba(184,84,40,0.5)" textAnchor="middle" fontFamily="monospace">logits</text>
         </svg>
     )
@@ -105,7 +109,7 @@ function PBlock({ id, name, sub, tokens, model, isActive, onClick, index }) {
             <div className="pblock-preview">
                 {id === 'tokenizer' && <TokenizerPreview tokens={tokens} />}
                 {id === 'embedding' && <EmbeddingPreview tokens={tokens} />}
-                {id === 'unembed' && <UnembedPreview />}
+                {id === 'unembed' && <UnembedPreview model={model} />}
                 {id === 'softmax' && <SoftmaxPreview />}
             </div>
             <div className="pblock-info">
@@ -145,6 +149,8 @@ function LayerFlow() {
 export default function Pipeline({ model, tokens, onBlockClick, onLayerClick, activeBlock, activeLayer }) {
     const T = tokens.length
     const layerShape = `[${T}×${model.d_model}]`
+    const fam = getFamily(model)
+    const ffnLabel = getFFNLabel(model, fam)
 
     const showFirst = Math.min(3, model.n_layers)
     const lastLayer = model.n_layers - 1
@@ -201,7 +207,7 @@ export default function Pipeline({ model, tokens, onBlockClick, onLayerClick, ac
                         })}
                         <motion.span className="layer-group-label"
                             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-                            {model.n_layers} transformer layers  ·  {layerShape} each
+                            {model.n_layers} transformer layers  ·  {layerShape} each  ·  {fam.norm}, {fam.attn}, {ffnLabel}
                         </motion.span>
                     </div>
 

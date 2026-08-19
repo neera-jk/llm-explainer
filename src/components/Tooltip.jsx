@@ -21,6 +21,17 @@ export const GLOSSARY = {
     'top-k': 'Limits sampling to only the K most likely tokens. Everything else gets zero probability. This prevents the model from picking extremely unlikely tokens that would make the output incoherent.',
     'dims per token': 'Each token is turned into a list of this many numbers. These numbers together encode the meaning, position, and context of the token.',
     'attn heads': 'Attention heads that run in parallel inside each layer. Each one learns different word relationships. Their outputs are combined into a single result.',
+    'MLA': 'Multi-head Latent Attention. Compresses K and V into a low-rank latent vector before caching, cutting KV cache by ~10x.',
+    'iRoPE': 'Interleaved RoPE. Alternates RoPE layers (chunked attention) with NoPE layers (no positional encoding, full causal mask). Key to extreme context lengths.',
+    'sliding_window': 'Sliding Window Attention. Each token only attends to the last W tokens instead of the full sequence. Reduces memory from O(n^2) to O(n*W).',
+    'shared_expert': 'A shared expert that processes every token regardless of routing, providing a stable baseline.',
+    'alternating_moe': 'Dense FFN and MoE layers alternate instead of using MoE everywhere. Stabilizes training.',
+    'qkNorm': 'Applies RMSNorm to Q and K vectors after projection but before RoPE. Prevents attention score explosion at scale.',
+    'RMSNorm': 'RMS Normalization. Simpler/faster than LayerNorm, skips mean subtraction.',
+    'SwiGLU': 'Gated activation with 3 weight matrices. Gate output controls which features pass through.',
+    'MoE': 'Mixture of Experts. Router picks a few expert FFNs per token. Massive capacity, fraction of compute.',
+    'kv_cache': 'Stores previously computed K and V vectors so they are not recomputed for each new token.',
+    'residual': 'Original input added back to sub-block output. Gives gradients a shortcut through the network.',
 }
 
 export default function Tooltip({ term, children }) {

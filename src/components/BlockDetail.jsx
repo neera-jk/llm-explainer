@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { getFamily } from '../data/models'
 import TokenizerBlock from './blocks/TokenizerBlock'
 import EmbeddingBlock from './blocks/EmbeddingBlock'
 import TransformerBlock from './blocks/TransformerBlock'
@@ -26,7 +27,8 @@ const BLOCK_ACCENTS = {
   softmax: { color: '#1a8a65', light: 'rgba(26,138,101,0.1)', border: 'rgba(26,138,101,0.3)', text: '#4db896' },
 }
 
-export default function BlockDetail({ blockId, layerIndex, model, family, tokens, predictions, promptKey, onClose }) {
+export default function BlockDetail({ blockId, layerIndex, model, tokens, predictions, promptKey, onClose }) {
+  const family = getFamily(model)
   const isLayer = blockId === 'transformer'
   const accent = isLayer ? { color: '#BA7517', text: '#EF9F27' } : BLOCK_ACCENTS[blockId]
   const label = isLayer ? `Layer ${layerIndex}` : BLOCK_LABELS[blockId]

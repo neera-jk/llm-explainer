@@ -244,9 +244,11 @@ export default function EmbeddingBlock({ model, family, tokens, accent }) {
                     matrix [{model.vocab_size.toLocaleString()} x {model.d_model}]</strong>, which returns
                 a list of {model.d_model} numbers (called a vector) for each token. These numbers encode meaning:
                 words with similar meanings end up with similar vectors.
-                {family && family.posEncoding === 'learned'
-                    ? ' A learned positional embedding is also added here so the model knows the order of the tokens.'
-                    : ' Position information is not added here. Instead, this model uses RoPE (Rotary Position Embeddings) which are applied later, inside each attention layer.'
+                {family && family.posEncoding === 'irope'
+                    ? ' Position is not added here. This model uses iRoPE, interleaving RoPE and NoPE layers inside attention for extreme context lengths.'
+                    : family && family.posEncoding === 'rope'
+                        ? ' Position is not added here. This model uses RoPE, applied inside each attention layer.'
+                        : ' A learned positional embedding is also added here so the model knows the order of the tokens.'
                 }
             </p>
 

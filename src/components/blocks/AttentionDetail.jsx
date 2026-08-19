@@ -20,7 +20,10 @@ export default function AttentionDetail({ T, model, family, tokens }) {
 
     const isGQA = family && family.attn === 'GQA'
     const isMLA = family && family.attn === 'MLA'
+    const isIRoPE = family && family.posEncoding === 'irope'
     const hasRoPE = family && family.posEncoding === 'rope'
+    const hasSWA = (model.sliding_window || 0) > 0
+    const hasQKNorm = family && family.qkNorm === true
     const kvHeads = model.n_kv_heads || model.n_heads
     const groupSize = isGQA ? model.n_heads / kvHeads : 1
 
@@ -32,11 +35,14 @@ export default function AttentionDetail({ T, model, family, tokens }) {
             title: 'Step 1: project into Q, K, V',
             desc: `The input [${T}x${model.d_model}] is multiplied by three separate weight matrices to create Query, Key, and Value vectors. Q is what each token is "looking for", K is what each token "advertises" about itself, and V is the actual information each token carries.`
                 + (isGQA ? ` With GQA, there are ${model.n_heads} Q heads but only ${kvHeads} K/V heads. Groups of ${groupSize} Q heads share the same K and V, making the KV cache ${groupSize}x smaller.` : ` Each of the ${model.n_heads} heads gets its own Q, K, and V of dimension ${model.head_dim}.`)
-                + (hasRoPE ? ' After projection, RoPE rotates the Q and K vectors based on their position in the sequence. This encodes where each token sits without needing a separate position embedding.' : ''),
+                + (hasQKNorm ? ' QK-Norm applies RMSNorm to the Q and K vectors after projection but before rotation, which prevents attention scores from exploding as the model scales up.' : '')
+                + (hasRoPE ? ' After projection, RoPE rotates the Q and K vectors based on their position in the sequence. This encodes where each token sits without needing a separate position embedding.' : '')
+                + (isIRoPE ? ' This model uses iRoPE, interleaving RoPE layers with NoPE layers (no positional encoding) across the stack, which helps it generalize to extreme context lengths.' : ''),
         },
         {
             title: 'Step 2: compute attention scores (Q x K^T)',
-            desc: `Each token's Query is compared against every Key via a dot product (multiply matching numbers and sum them up). This produces a ${T}x${T} grid of scores. A high score at row "${displayTokens[2] || 'sat'}", column "${displayTokens[1] || 'cat'}" means the token "${displayTokens[2] || 'sat'}" should pay a lot of attention to "${displayTokens[1] || 'cat'}". The scores are divided by ${Math.round(Math.sqrt(model.head_dim))} (the square root of ${model.head_dim}) to prevent them from growing too large.`,
+            desc: `Each token's Query is compared against every Key via a dot product (multiply matching numbers and sum them up). This produces a ${T}x${T} grid of scores. A high score at row "${displayTokens[2] || 'sat'}", column "${displayTokens[1] || 'cat'}" means the token "${displayTokens[2] || 'sat'}" should pay a lot of attention to "${displayTokens[1] || 'cat'}". The scores are divided by ${Math.round(Math.sqrt(model.head_dim))} (the square root of ${model.head_dim}) to prevent them from growing too large.`
+                + (hasSWA ? ` With sliding window attention, each token only attends to the previous ${model.sliding_window} tokens instead of the full sequence, so most of this grid is masked out and memory stays linear in sequence length.` : ''),
         },
         {
             title: 'Step 3: softmax turns scores into weights',
@@ -44,7 +50,8 @@ export default function AttentionDetail({ T, model, family, tokens }) {
         },
         {
             title: 'Step 4: weights x V = context-aware output',
-            desc: `Each token's output is a weighted mix of all Value vectors. So "${displayTokens[2] || 'sat'}"'s output becomes 48% of its own Value + 35% of "${displayTokens[1] || 'cat'}"'s Value + the rest from other tokens. This runs for all ${model.n_heads} Q heads${isGQA ? ` (sharing ${kvHeads} K/V heads)` : ''}. Their outputs are concatenated and projected back to ${model.d_model} dimensions.`,
+            desc: `Each token's output is a weighted mix of all Value vectors. So "${displayTokens[2] || 'sat'}"'s output becomes 48% of its own Value + 35% of "${displayTokens[1] || 'cat'}"'s Value + the rest from other tokens. This runs for all ${model.n_heads} Q heads${isGQA ? ` (sharing ${kvHeads} K/V heads)` : ''}. Their outputs are concatenated and projected back to ${model.d_model} dimensions.`
+                + (isMLA ? ' With MLA, the compressed latent K and V are decompressed back to full head dimension at this stage, so the cache stays small while attention still runs at full width.' : ''),
         },
     ]
 
@@ -94,10 +101,22 @@ export default function AttentionDetail({ T, model, family, tokens }) {
                                 <span className="qkv-label" style={{ color: '#BA7517' }}>V</span>
                                 <span className="qkv-dim" style={{ color: '#BA7517' }}>{kvHeads} x [{T}x{model.head_dim}]</span>
                             </motion.div>
+                            {hasQKNorm && (
+                                <motion.div style={{ fontSize: 10, color: '#2A9D8F', background: 'rgba(42,157,143,0.08)', border: '1px solid rgba(42,157,143,0.25)', borderRadius: 6, padding: '4px 10px', marginLeft: 4 }}
+                                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+                                    + QK-Norm
+                                </motion.div>
+                            )}
                             {hasRoPE && (
                                 <motion.div style={{ fontSize: 10, color: '#1a8a65', background: 'rgba(26,138,101,0.08)', border: '1px solid rgba(26,138,101,0.2)', borderRadius: 6, padding: '4px 10px', marginLeft: 4 }}
-                                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+                                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}>
                                     + RoPE on Q, K
+                                </motion.div>
+                            )}
+                            {isIRoPE && (
+                                <motion.div style={{ fontSize: 10, color: '#1a8a65', background: 'rgba(26,138,101,0.08)', border: '1px solid rgba(26,138,101,0.2)', borderRadius: 6, padding: '4px 10px', marginLeft: 4 }}
+                                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
+                                    + iRoPE (interleaved)
                                 </motion.div>
                             )}
                         </div>
@@ -126,6 +145,11 @@ export default function AttentionDetail({ T, model, family, tokens }) {
                                 ))}
                             </div>
                             <p className="attn-note">each row is a query token, each column is a key token. brighter cells mean higher attention.</p>
+                            {hasSWA && (
+                                <p className="attn-note" style={{ color: '#BA7517' }}>
+                                    with a sliding window of {model.sliding_window} tokens, cells outside the window are masked, so far-apart tokens never attend to each other directly.
+                                </p>
+                            )}
                         </div>
                     )}
 

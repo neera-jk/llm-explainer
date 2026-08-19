@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { isMoE } from '../../data/models'
 
 export default function FFNDetail({ T, model, family }) {
     const [phase, setPhase] = useState('idle')
@@ -8,8 +9,10 @@ export default function FFNDetail({ T, model, family }) {
     const timerRef = useRef(null)
     const BAR_COUNT = 28
 
-    const isSwiGLU = family && family.ffn.includes('SwiGLU')
-    const isMoE = family && family.ffn.includes('MoE')
+    const isSwiGLU = family && family.ffn === 'SwiGLU'
+    const isMoEModel = isMoE(model)
+    const hasSharedExperts = (model.n_shared_experts || 0) > 0
+    const isAlternating = model.alternating_moe === true
     const ratio = (model.d_ff / model.d_model).toFixed(1)
     const activationName = isSwiGLU ? 'SwiGLU' : 'GELU'
 
@@ -69,7 +72,10 @@ export default function FFNDetail({ T, model, family }) {
                     ? ` SwiGLU uses three weight matrices. W_gate and W_up both project the input to ${model.d_ff} dimensions in parallel. The gate output goes through a swish activation, then is multiplied element-wise with the up output. This gating lets the model learn which features to keep and which to discard. Finally W_down compresses back to ${model.d_model}.`
                     : ` It first expands the vector to ${model.d_ff} dimensions (${ratio}x wider), applies GELU activation (which smoothly suppresses negative values), then compresses back to ${model.d_model}. This expand-and-compress bottleneck forces the model to learn which features matter.`
                 }
-                {isMoE ? ` With MoE, a router first picks ${model.n_active_experts} of ${model.n_experts} expert FFNs for each token. Each expert is a separate copy of this FFN. Only the selected experts run, so cost stays manageable despite the massive total parameter count.` : ''}
+                {isMoEModel ? ` With MoE, a router first picks ${model.n_active_experts} of ${model.n_experts} expert FFNs for each token. Each expert is a separate copy of this FFN. Only the selected experts run, so cost stays manageable despite the massive total parameter count.` : ''}
+                {hasSharedExperts ? ` On top of the routed experts, ${model.n_shared_experts} shared expert runs on every token no matter what, giving the layer a stable baseline that always contributes.` : ''}
+                {isAlternating ? ' Not every layer is MoE: dense and MoE feed-forward layers alternate through the stack, which helps keep training stable.' : ''}
+                {(model.n_dense_layers || 0) > 0 ? ` The first ${model.n_dense_layers} layers use a plain dense FFN before the MoE layers begin.` : ''}
             </p>
 
             <div className="anim-controls">

@@ -1,0 +1,38 @@
+{
+    "key": "gpt2-large",
+    "label": "GPT-2 large",
+    "family": "gpt2",
+    "params": "762M",
+    "source": {
+        "repo": "openai-community/gpt2-large",
+        "revision": "32b71b12589c2f8d625668d2335a01cac3249519"
+    },
+    "model_type": "gpt2",
+    "architectures": [
+        "GPT2LMHeadModel"
+    ],
+    "d_model": 1280,
+    "n_layers": 36,
+    "n_heads": 20,
+    "n_kv_heads": 20,
+    "head_dim": 64,
+    "vocab_size": 50257,
+    "context_length": 1024,
+    "d_ff": 5120,
+    "sliding_window": 0,
+    "d_ff_expert": null,
+    "n_experts": 0,
+    "n_active_experts": 0,
+    "n_shared_experts": 0,
+    "n_dense_layers": 0,
+    "alternating_moe": false,
+    "features": {
+        "attn": "MHA",
+        "norm": "LayerNorm",
+        "ffn": "GELU",
+        "posEncoding": "learned",
+        "hasBias": true,
+        "tiedEmbeddings": true,
+        "qkNorm": false
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "key": "gpt2-small",
+    "label": "GPT-2 small",
+    "family": "gpt2",
+    "params": "117M",
+    "source": {
+        "repo": "openai-community/gpt2",
+        "revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e"
+    },
+    "model_type": "gpt2",
+    "architectures": [
+        "GPT2LMHeadModel"
+    ],
+    "d_model": 768,
+    "n_layers": 12,
+    "n_heads": 12,
+    "n_kv_heads": 12,
+    "head_dim": 64,
+    "vocab_size": 50257,
+    "context_length": 1024,
+    "d_ff": 3072,
+    "sliding_window": 0,
+    "d_ff_expert": null,
+    "n_experts": 0,
+    "n_active_experts": 0,
+    "n_shared_experts": 0,
+    "n_dense_layers": 0,
+    "alternating_moe": false,
+    "features": {
+        "attn": "MHA",
+        "norm": "LayerNorm",
+        "ffn": "GELU",
+        "posEncoding": "learned",
+        "hasBias": true,
+        "tiedEmbeddings": true,
+        "qkNorm": false
+    }
+}

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { isMoE } from '../../data/models'
+import { isMoE, ffnWidth } from '../../data/models'
 
 export default function FFNDetail({ T, model, family }) {
     const [phase, setPhase] = useState('idle')
@@ -13,7 +13,8 @@ export default function FFNDetail({ T, model, family }) {
     const isMoEModel = isMoE(model)
     const hasSharedExperts = (model.n_shared_experts || 0) > 0
     const isAlternating = model.alternating_moe === true
-    const ratio = (model.d_ff / model.d_model).toFixed(1)
+    const dFF = ffnWidth(model)
+    const ratio = (dFF / model.d_model).toFixed(1)
     const activationName = isSwiGLU ? 'SwiGLU' : 'GELU'
 
     useEffect(() => {
@@ -58,7 +59,7 @@ export default function FFNDetail({ T, model, family }) {
 
     const labels = {
         idle: `Input: each token is a vector of ${model.d_model} numbers`,
-        expanding: `Expanding: ${model.d_model} to ${model.d_ff} numbers (${ratio}x wider)${isSwiGLU ? ' via gate and up projections in parallel' : ''}...`,
+        expanding: `Expanding: ${model.d_model} to ${dFF} numbers (${ratio}x wider)${isSwiGLU ? ' via gate and up projections in parallel' : ''}...`,
         contracting: `Applying ${activationName}${isSwiGLU ? ' gating' : ' activation'}, then compressing back to ${model.d_model}...`,
         done: `Done. Output: [${T}x${model.d_model}]. Same shape as input.`,
     }
@@ -69,8 +70,8 @@ export default function FFNDetail({ T, model, family }) {
                 The feed-forward network processes each token independently (unlike attention, which mixes
                 tokens together).
                 {isSwiGLU
-                    ? ` SwiGLU uses three weight matrices. W_gate and W_up both project the input to ${model.d_ff} dimensions in parallel. The gate output goes through a swish activation, then is multiplied element-wise with the up output. This gating lets the model learn which features to keep and which to discard. Finally W_down compresses back to ${model.d_model}.`
-                    : ` It first expands the vector to ${model.d_ff} dimensions (${ratio}x wider), applies GELU activation (which smoothly suppresses negative values), then compresses back to ${model.d_model}. This expand-and-compress bottleneck forces the model to learn which features matter.`
+                    ? ` SwiGLU uses three weight matrices. W_gate and W_up both project the input to ${dFF} dimensions in parallel. The gate output goes through a swish activation, then is multiplied element-wise with the up output. This gating lets the model learn which features to keep and which to discard. Finally W_down compresses back to ${model.d_model}.`
+                    : ` It first expands the vector to ${dFF} dimensions (${ratio}x wider), applies GELU activation (which smoothly suppresses negative values), then compresses back to ${model.d_model}. This expand-and-compress bottleneck forces the model to learn which features matter.`
                 }
                 {isMoEModel ? ` With MoE, a router first picks ${model.n_active_experts} of ${model.n_experts} expert FFNs for each token. Each expert is a separate copy of this FFN. Only the selected experts run, so cost stays manageable despite the massive total parameter count.` : ''}
                 {hasSharedExperts ? ` On top of the routed experts, ${model.n_shared_experts} shared expert runs on every token no matter what, giving the layer a stable baseline that always contributes.` : ''}
@@ -101,13 +102,13 @@ export default function FFNDetail({ T, model, family }) {
             <div className="ffn-labels">
                 <span>input {model.d_model}d</span>
                 <span className={`ffn-mid-label ${phase === 'expanding' ? 'ffn-mid-label--visible' : ''}`}>
-                    expanded {model.d_ff}d ({ratio}x wider)
+                    expanded {dFF}d ({ratio}x wider)
                 </span>
                 <span>output {model.d_model}d</span>
             </div>
 
             <div className="kv-note" style={{ marginTop: 16 }}>
-                <strong>Why expand then compress?</strong> The wider hidden layer ({model.d_ff} dimensions)
+                <strong>Why expand then compress?</strong> The wider hidden layer ({dFF} dimensions)
                 gives the model room to represent complex patterns. Compressing back to {model.d_model} forces
                 it to keep only the most useful information.
                 {isSwiGLU

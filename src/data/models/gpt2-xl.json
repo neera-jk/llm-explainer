@@ -1,0 +1,38 @@
+{
+    "key": "gpt2-xl",
+    "label": "GPT-2 XL",
+    "family": "gpt2",
+    "params": "1.5B",
+    "source": {
+        "repo": "openai-community/gpt2-xl",
+        "revision": "15ea56dee5df4983c59b2538573817e1667135e2"
+    },
+    "model_type": "gpt2",
+    "architectures": [
+        "GPT2LMHeadModel"
+    ],
+    "d_model": 1600,
+    "n_layers": 48,
+    "n_heads": 25,
+    "n_kv_heads": 25,
+    "head_dim": 64,
+    "vocab_size": 50257,
+    "context_length": 1024,
+    "d_ff": 6400,
+    "sliding_window": 0,
+    "d_ff_expert": null,
+    "n_experts": 0,
+    "n_active_experts": 0,
+    "n_shared_experts": 0,
+    "n_dense_layers": 0,
+    "alternating_moe": false,
+    "features": {
+        "attn": "MHA",
+        "norm": "LayerNorm",
+        "ffn": "GELU",
+        "posEncoding": "learned",
+        "hasBias": true,
+        "tiedEmbeddings": true,
+        "qkNorm": false
+    }
+}

@@ -1,0 +1,42 @@
+{
+    "key": "llama4-scout",
+    "label": "Llama 4 Scout",
+    "family": "llama4",
+    "params": "109B (17B active)",
+    "source": {
+        "repo": "meta-llama/Llama-4-Scout-17B-16E",
+        "mirror": "unsloth/Llama-4-Scout-17B-16E",
+        "revision": "14d516bdff6ac06cec40678529222f193386189c",
+        "config_from": "unsloth/Llama-4-Scout-17B-16E",
+        "config_revision": "62d69dc0a79bb9251fe44d1397ddf34fc23e1068"
+    },
+    "model_type": "llama4",
+    "architectures": [
+        "Llama4ForConditionalGeneration"
+    ],
+    "d_model": 5120,
+    "n_layers": 48,
+    "n_heads": 40,
+    "n_kv_heads": 8,
+    "head_dim": 128,
+    "vocab_size": 202048,
+    "context_length": 262144,
+    "d_ff": null,
+    "sliding_window": 0,
+    "d_ff_expert": 8192,
+    "n_experts": 16,
+    "n_active_experts": 1,
+    "n_shared_experts": 1,
+    "n_dense_layers": 0,
+    "alternating_moe": false,
+    "attention_chunk_size": 8192,
+    "features": {
+        "attn": "GQA",
+        "norm": "RMSNorm",
+        "ffn": "SwiGLU",
+        "posEncoding": "irope",
+        "hasBias": false,
+        "tiedEmbeddings": false,
+        "qkNorm": true
+    }
+}

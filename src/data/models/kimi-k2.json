@@ -1,0 +1,45 @@
+{
+    "key": "kimi-k2",
+    "label": "Kimi K2",
+    "family": "deepseek",
+    "params": "1T (32B active)",
+    "source": {
+        "repo": "moonshotai/Kimi-K2-Instruct",
+        "revision": "fd1984e2b7a3350dbf7305fe73a4ede25c14de50"
+    },
+    "model_type": "kimi_k2",
+    "architectures": [
+        "DeepseekV3ForCausalLM"
+    ],
+    "d_model": 7168,
+    "n_layers": 61,
+    "n_heads": 64,
+    "n_kv_heads": 64,
+    "head_dim": 192,
+    "vocab_size": 163840,
+    "context_length": 131072,
+    "d_ff": 18432,
+    "sliding_window": 0,
+    "d_ff_expert": 2048,
+    "n_experts": 384,
+    "n_active_experts": 8,
+    "n_shared_experts": 1,
+    "n_dense_layers": 1,
+    "alternating_moe": false,
+    "mla": {
+        "kv_lora_rank": 512,
+        "q_lora_rank": 1536,
+        "qk_nope_head_dim": 128,
+        "qk_rope_head_dim": 64,
+        "v_head_dim": 128
+    },
+    "features": {
+        "attn": "MLA",
+        "norm": "RMSNorm",
+        "ffn": "SwiGLU",
+        "posEncoding": "rope",
+        "hasBias": false,
+        "tiedEmbeddings": false,
+        "qkNorm": false
+    }
+}

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { vHeadDim } from '../../data/models'
 
 const SCORES = [
     [2.1, 0.8, 0.3, 0.5],
@@ -99,7 +100,7 @@ export default function AttentionDetail({ T, model, family, tokens }) {
                             <motion.div className="qkv-box" style={{ background: 'rgba(186,117,23,0.1)', border: '1px solid rgba(186,117,23,0.3)' }}
                                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.35 }}>
                                 <span className="qkv-label" style={{ color: '#BA7517' }}>V</span>
-                                <span className="qkv-dim" style={{ color: '#BA7517' }}>{kvHeads} x [{T}x{model.head_dim}]</span>
+                                <span className="qkv-dim" style={{ color: '#BA7517' }}>{kvHeads} x [{T}x{vHeadDim(model)}]</span>
                             </motion.div>
                             {hasQKNorm && (
                                 <motion.div style={{ fontSize: 10, color: '#2A9D8F', background: 'rgba(42,157,143,0.08)', border: '1px solid rgba(42,157,143,0.25)', borderRadius: 6, padding: '4px 10px', marginLeft: 4 }}
@@ -191,7 +192,7 @@ export default function AttentionDetail({ T, model, family, tokens }) {
                                 <text x="148" y="54" fontSize="14" fill="var(--text-muted)" textAnchor="middle">=</text>
                                 <rect x="162" y="26" width="80" height="48" rx="6" fill="rgba(127,119,221,0.12)" stroke="rgba(127,119,221,0.3)" strokeWidth="0.5" />
                                 <text x="202" y="46" fontSize="11" fill="#AFA9EC" textAnchor="middle" fontFamily="var(--font-mono)" fontWeight="500">context</text>
-                                <text x="202" y="62" fontSize="9" fill="rgba(127,119,221,0.5)" textAnchor="middle" fontFamily="var(--font-mono)">[{T}x{model.head_dim}]</text>
+                                <text x="202" y="62" fontSize="9" fill="rgba(127,119,221,0.5)" textAnchor="middle" fontFamily="var(--font-mono)">[{T}x{vHeadDim(model)}]</text>
                                 <text x="264" y="46" fontSize="10" fill="var(--text-muted)" textAnchor="middle">x{model.n_heads} heads</text>
                                 <text x="264" y="60" fontSize="10" fill="var(--text-muted)" textAnchor="middle">concat</text>
                                 <line x1="290" y1="50" x2="308" y2="50" stroke="var(--border-soft)" strokeWidth="1" />
@@ -199,7 +200,7 @@ export default function AttentionDetail({ T, model, family, tokens }) {
                                 <rect x="318" y="34" width="56" height="32" rx="4" fill="rgba(127,119,221,0.08)" stroke="rgba(127,119,221,0.25)" strokeWidth="0.5" />
                                 <text x="346" y="54" fontSize="9" fill="#AFA9EC" textAnchor="middle" fontFamily="var(--font-mono)">[{T}x{model.d_model}]</text>
                             </svg>
-                            <p className="attn-note">{model.n_heads} Q heads{isGQA ? `, ${kvHeads} KV heads` : ''} of {model.head_dim} dimensions each, concatenated back to {model.d_model} dimensions.</p>
+                            <p className="attn-note">{model.n_heads} Q heads{isGQA ? `, ${kvHeads} KV heads` : ''} of {vHeadDim(model)} dimensions each, concatenated back to {model.d_model} dimensions.</p>
                         </div>
                     )}
                 </motion.div>

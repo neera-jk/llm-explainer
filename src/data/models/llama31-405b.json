@@ -1,0 +1,41 @@
+{
+    "key": "llama31-405b",
+    "label": "Llama 3.1 405B",
+    "family": "llama",
+    "params": "405B",
+    "source": {
+        "repo": "meta-llama/Llama-3.1-405B",
+        "mirror": "unsloth/Meta-Llama-3.1-405B-bnb-4bit",
+        "revision": "b906e4dc842aa489c962f9db26554dcfdde901fe",
+        "config_from": "unsloth/Meta-Llama-3.1-405B-bnb-4bit",
+        "config_revision": "b77489abd4cb571c2ad05aa1a05f6bedb193e227"
+    },
+    "model_type": "llama",
+    "architectures": [
+        "LlamaForCausalLM"
+    ],
+    "d_model": 16384,
+    "n_layers": 126,
+    "n_heads": 128,
+    "n_kv_heads": 8,
+    "head_dim": 128,
+    "vocab_size": 128256,
+    "context_length": 131072,
+    "d_ff": 53248,
+    "sliding_window": 0,
+    "d_ff_expert": null,
+    "n_experts": 0,
+    "n_active_experts": 0,
+    "n_shared_experts": 0,
+    "n_dense_layers": 0,
+    "alternating_moe": false,
+    "features": {
+        "attn": "GQA",
+        "norm": "RMSNorm",
+        "ffn": "SwiGLU",
+        "posEncoding": "rope",
+        "hasBias": false,
+        "tiedEmbeddings": false,
+        "qkNorm": false
+    }
+}

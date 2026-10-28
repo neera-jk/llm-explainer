@@ -1,0 +1,41 @@
+{
+    "key": "llama3-70b",
+    "label": "Llama 3 70B",
+    "family": "llama",
+    "params": "70B",
+    "source": {
+        "repo": "meta-llama/Meta-Llama-3-70B",
+        "mirror": "NousResearch/Meta-Llama-3-70B",
+        "revision": "c82494877ce7f6d7d317c56ec081328e382c72fe",
+        "config_from": "NousResearch/Meta-Llama-3-70B",
+        "config_revision": "fdbf133d993d2b8157e518bfc8bc4570b2d31c45"
+    },
+    "model_type": "llama",
+    "architectures": [
+        "LlamaForCausalLM"
+    ],
+    "d_model": 8192,
+    "n_layers": 80,
+    "n_heads": 64,
+    "n_kv_heads": 8,
+    "head_dim": 128,
+    "vocab_size": 128256,
+    "context_length": 8192,
+    "d_ff": 28672,
+    "sliding_window": 0,
+    "d_ff_expert": null,
+    "n_experts": 0,
+    "n_active_experts": 0,
+    "n_shared_experts": 0,
+    "n_dense_layers": 0,
+    "alternating_moe": false,
+    "features": {
+        "attn": "GQA",
+        "norm": "RMSNorm",
+        "ffn": "SwiGLU",
+        "posEncoding": "rope",
+        "hasBias": false,
+        "tiedEmbeddings": false,
+        "qkNorm": false
+    }
+}

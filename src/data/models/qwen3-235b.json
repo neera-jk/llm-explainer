@@ -1,0 +1,38 @@
+{
+    "key": "qwen3-235b",
+    "label": "Qwen3 235B",
+    "family": "qwen",
+    "params": "235B (22B active)",
+    "source": {
+        "repo": "Qwen/Qwen3-235B-A22B",
+        "revision": "8efa61729e24bd65b1d152b5ab5409052aa80e65"
+    },
+    "model_type": "qwen3_moe",
+    "architectures": [
+        "Qwen3MoeForCausalLM"
+    ],
+    "d_model": 4096,
+    "n_layers": 94,
+    "n_heads": 64,
+    "n_kv_heads": 4,
+    "head_dim": 128,
+    "vocab_size": 151936,
+    "context_length": 40960,
+    "d_ff": null,
+    "sliding_window": 0,
+    "d_ff_expert": 1536,
+    "n_experts": 128,
+    "n_active_experts": 8,
+    "n_shared_experts": 0,
+    "n_dense_layers": 0,
+    "alternating_moe": false,
+    "features": {
+        "attn": "GQA",
+        "norm": "RMSNorm",
+        "ffn": "SwiGLU",
+        "posEncoding": "rope",
+        "hasBias": false,
+        "tiedEmbeddings": false,
+        "qkNorm": true
+    }
+}

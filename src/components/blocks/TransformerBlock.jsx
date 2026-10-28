@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getFamily, isMoE, getFFNLabel } from '../../data/models'
+import { getFamily, isMoE, getFFNLabel, ffnWidth, vHeadDim } from '../../data/models'
 import AttentionDetail from './AttentionDetail'
 import FFNDetail from './FFNDetail'
 import MatmulViz from './MatmulViz'
@@ -87,7 +87,7 @@ function AttentionArch({ model, fam, T }) {
                 <div className="arch-fan">
                     <div className="arch-fan-item arch-fan-item--q">Q <span className="arch-fan-dim">{model.n_heads} x {model.head_dim}d</span></div>
                     <div className="arch-fan-item arch-fan-item--k">K <span className="arch-fan-dim">{kvHeads} x {model.head_dim}d</span></div>
-                    <div className="arch-fan-item arch-fan-item--v">V <span className="arch-fan-dim">{kvHeads} x {model.head_dim}d</span></div>
+                    <div className="arch-fan-item arch-fan-item--v">V <span className="arch-fan-dim">{kvHeads} x {vHeadDim(model)}d</span></div>
                 </div>
                 {hasQKNorm && (
                     <>
@@ -142,7 +142,9 @@ function AttentionArch({ model, fam, T }) {
                 {isIRoPE && <span className="arch-pill arch-pill--green">iRoPE: RoPE + NoPE layers interleaved</span>}
                 {hasSWA && <span className="arch-pill arch-pill--amber">sliding window: {model.sliding_window} tokens</span>}
                 <span className="arch-pill arch-pill--purple">{model.n_heads} Q heads, {kvHeads} KV heads</span>
-                <span className="arch-pill arch-pill--amber">KV cache: {kvHeads} x {model.head_dim}d per layer</span>
+                {isMLA
+                    ? <span className="arch-pill arch-pill--amber">KV cache: 1 x {model.mla.kv_lora_rank + model.mla.qk_rope_head_dim}d latent per layer</span>
+                    : <span className="arch-pill arch-pill--amber">KV cache: {kvHeads} x {model.head_dim}d per layer</span>}
             </div>
             <p className="arch-hint">
                 {isGQA
@@ -164,7 +166,8 @@ function FFNArch({ model, fam, T }) {
     const isMoEModel = isMoE(model)
     const hasSharedExperts = (model.n_shared_experts || 0) > 0
     const isAlternating = model.alternating_moe === true
-    const ratio = (model.d_ff / model.d_model).toFixed(1)
+    const dFF = ffnWidth(model)
+    const ratio = (dFF / model.d_model).toFixed(1)
 
     return (
         <div className="arch-body">
@@ -187,16 +190,16 @@ function FFNArch({ model, fam, T }) {
                     <>
                         <div className="arch-fan">
                             <div className="arch-fan-item" style={{ background: 'rgba(184,84,40,0.08)', border: '1px solid rgba(184,84,40,0.25)', color: '#b85428' }}>
-                                W_gate <span className="arch-fan-dim">[{model.d_model}x{model.d_ff}]</span>
+                                W_gate <span className="arch-fan-dim">[{model.d_model}x{dFF}]</span>
                             </div>
                             <div className="arch-fan-item" style={{ background: 'rgba(127,119,221,0.08)', border: '1px solid rgba(127,119,221,0.25)', color: '#7F77DD' }}>
-                                W_up <span className="arch-fan-dim">[{model.d_model}x{model.d_ff}]</span>
+                                W_up <span className="arch-fan-dim">[{model.d_model}x{dFF}]</span>
                             </div>
                         </div>
                         <ArchArrow color="lf-pulse--amber" />
                         <div className="arch-node arch-node--amber" style={{ height: 64 }}>
                             <span className="arch-node-title">swish(gate) x up</span>
-                            <span className="arch-node-sub">[{T}x{model.d_ff}]</span>
+                            <span className="arch-node-sub">[{T}x{dFF}]</span>
                             <span className="arch-expand-note">{ratio}x wider</span>
                         </div>
                     </>
@@ -204,12 +207,12 @@ function FFNArch({ model, fam, T }) {
                     <>
                         <div className="arch-node" style={{ height: 52 }}>
                             <span className="arch-node-title">W_up</span>
-                            <span className="arch-node-sub">[{model.d_model}x{model.d_ff}]</span>
+                            <span className="arch-node-sub">[{model.d_model}x{dFF}]</span>
                         </div>
                         <ArchArrow color="lf-pulse--amber" />
                         <div className="arch-node arch-node--amber arch-node--tall">
                             <span className="arch-node-title">GELU</span>
-                            <span className="arch-node-sub">[{T}x{model.d_ff}]</span>
+                            <span className="arch-node-sub">[{T}x{dFF}]</span>
                             <span className="arch-expand-note">{ratio}x wider</span>
                         </div>
                     </>
@@ -217,7 +220,7 @@ function FFNArch({ model, fam, T }) {
                 <ArchArrow color="lf-pulse--amber" />
                 <div className="arch-node" style={{ height: 52 }}>
                     <span className="arch-node-title">W_down</span>
-                    <span className="arch-node-sub">[{model.d_ff}x{model.d_model}]</span>
+                    <span className="arch-node-sub">[{dFF}x{model.d_model}]</span>
                 </div>
                 <ArchArrow color="lf-pulse--amber" />
                 <div className="arch-node arch-node--purple" style={{ height: 52 }}>
@@ -236,7 +239,7 @@ function FFNArch({ model, fam, T }) {
             <p className="arch-hint">
                 {isSwiGLU
                     ? `SwiGLU uses three weight matrices instead of two. W_gate and W_up project in parallel, then the gate output (after swish activation) controls which features from W_up pass through.`
-                    : `Standard FFN: expand to ${model.d_ff} dimensions with W_up, apply GELU activation, then compress back to ${model.d_model} with W_down.`
+                    : `Standard FFN: expand to ${dFF} dimensions with W_up, apply GELU activation, then compress back to ${model.d_model} with W_down.`
                 }
                 {isMoEModel ? ` With MoE, each token is routed to only ${model.n_active_experts} of ${model.n_experts} available expert FFNs. Massive total capacity, but only a fraction runs per token.` : ''}
                 {hasSharedExperts ? ` ${model.n_shared_experts} shared expert also runs on every token, giving a stable baseline on top of the routed experts.` : ''}

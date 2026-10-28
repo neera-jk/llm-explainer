@@ -1,0 +1,38 @@
+{
+    "key": "mixtral-8x7b",
+    "label": "Mixtral 8x7B",
+    "family": "mixtral",
+    "params": "46.7B (12.9B active)",
+    "source": {
+        "repo": "mistralai/Mixtral-8x7B-v0.1",
+        "revision": "fc7ac94680e38d7348cfa806e51218e6273104b0"
+    },
+    "model_type": "mixtral",
+    "architectures": [
+        "MixtralForCausalLM"
+    ],
+    "d_model": 4096,
+    "n_layers": 32,
+    "n_heads": 32,
+    "n_kv_heads": 8,
+    "head_dim": 128,
+    "vocab_size": 32000,
+    "context_length": 32768,
+    "d_ff": null,
+    "sliding_window": 0,
+    "d_ff_expert": 14336,
+    "n_experts": 8,
+    "n_active_experts": 2,
+    "n_shared_experts": 0,
+    "n_dense_layers": 0,
+    "alternating_moe": false,
+    "features": {
+        "attn": "GQA",
+        "norm": "RMSNorm",
+        "ffn": "SwiGLU",
+        "posEncoding": "rope",
+        "hasBias": false,
+        "tiedEmbeddings": false,
+        "qkNorm": false
+    }
+}

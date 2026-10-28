@@ -1,77 +1,84 @@
 #!/usr/bin/env node
 // Usage:
 //   node scripts/import-hf.mjs <org/repo> [--mirror <org/repo>]   print the normalized config
-//   node scripts/import-hf.mjs --check                            diff src/data/models.js against HF
-import { readFile } from 'node:fs/promises'
-import { fetchConfig, normalize, isMoE } from './lib/hf.mjs'
-import { MODEL_REGISTRY, MODEL_FAMILIES } from '../src/data/models.js'
+//   node scripts/import-hf.mjs --check                            compare src/data/models/*.json with HF
+//   node scripts/import-hf.mjs --write                            same, and update the files that differ
+import { readdir, readFile, writeFile } from 'node:fs/promises'
+import { fetchConfig, normalize } from './lib/hf.mjs'
 
-const DIM_FIELDS = [
-    'd_model', 'n_layers', 'n_heads', 'n_kv_heads', 'head_dim', 'vocab_size', 'context_length',
-    'd_ff', 'n_experts', 'n_active_experts', 'n_shared_experts', 'n_dense_layers',
-    'sliding_window', 'alternating_moe',
-]
-const FEATURE_FIELDS = ['attn', 'norm', 'ffn', 'posEncoding', 'hasBias', 'tiedEmbeddings', 'qkNorm']
+const MODELS_DIR = new URL('../src/data/models/', import.meta.url)
+// written by hand; everything else in a model file is regenerated from HF
+const HAND_FIELDS = ['key', 'label', 'family', 'params']
 
 async function importRepo(repo, mirror) {
     const { config, source } = await fetchConfig(repo, { mirror })
-    return { source, ...normalize(config) }
+    return { source: { repo, ...(mirror && { mirror }), ...source }, ...normalize(config) }
 }
 
-function diffEntry(entry, imported) {
-    const family = MODEL_FAMILIES[entry.family] || {}
-    const diffs = []
-    for (const field of DIM_FIELDS) {
-        if (!(field in entry)) continue
-        // the UI draws d_ff as the per-expert width for MoE models
-        const actual = field === 'd_ff' && isMoE(imported) ? imported.d_ff_expert : imported[field]
-        if (entry[field] !== actual) diffs.push({ field, ours: entry[field], hf: actual })
-    }
-    for (const field of FEATURE_FIELDS) {
-        if (family[field] !== imported.features[field]) {
-            diffs.push({ field: `family.${field}`, ours: family[field], hf: imported.features[field] })
-        }
-    }
-    return diffs
+function flatten(obj, prefix = '') {
+    return Object.entries(obj).flatMap(([k, v]) =>
+        v && typeof v === 'object' && !Array.isArray(v)
+            ? flatten(v, `${prefix}${k}.`)
+            : [[`${prefix}${k}`, JSON.stringify(v)]])
 }
 
-async function check() {
-    const sources = JSON.parse(await readFile(new URL('./hf-sources.json', import.meta.url), 'utf8'))
-    const keys = Object.keys(MODEL_REGISTRY)
-    const results = await Promise.all(keys.map(async key => {
-        const src = sources[key]
-        if (!src) return { key, error: 'no entry in scripts/hf-sources.json' }
+// a new upstream commit on its own isn't a difference, so source is skipped
+function generatedFields(model) {
+    const rest = { ...model }
+    for (const f of ['source', ...HAND_FIELDS]) delete rest[f]
+    return Object.fromEntries(flatten(rest))
+}
+
+function diffModel(current, fresh) {
+    const ours = generatedFields(current)
+    const hf = generatedFields(fresh)
+    return [...new Set([...Object.keys(ours), ...Object.keys(hf)])]
+        .filter(field => ours[field] !== hf[field])
+        .map(field => ({ field, ours: ours[field], hf: hf[field] }))
+}
+
+async function sync({ write }) {
+    const files = (await readdir(MODELS_DIR)).filter(f => f.endsWith('.json')).sort()
+    const results = await Promise.all(files.map(async file => {
+        const url = new URL(file, MODELS_DIR)
+        const current = JSON.parse(await readFile(url, 'utf8'))
         try {
-            return { key, imported: await importRepo(src.repo, src.mirror) }
+            const fresh = await importRepo(current.source.repo, current.source.mirror)
+            return { file, url, current, fresh, diffs: diffModel(current, fresh) }
         } catch (err) {
-            return { key, error: err.message }
+            return { file, error: err.message }
         }
     }))
 
-    let failed = 0
-    for (const { key, imported, error } of results) {
+    let errors = 0
+    let differing = 0
+    for (const { file, url, current, fresh, diffs, error } of results) {
         if (error) {
-            failed++
-            console.log(`✗ ${key}: ${error}`)
+            errors++
+            console.log(`✗ ${file}: ${error}`)
             continue
         }
-        const diffs = diffEntry(MODEL_REGISTRY[key], imported)
-        const via = imported.source.config_from ? ` (config via ${imported.source.config_from})` : ''
         if (!diffs.length) {
-            console.log(`✓ ${key}  ${imported.source.repo}${via}`)
+            console.log(`✓ ${file}`)
             continue
         }
-        failed++
-        console.log(`✗ ${key}  ${imported.source.repo}${via}`)
-        for (const d of diffs) console.log(`    ${d.field.padEnd(22)} ours: ${String(d.ours).padEnd(10)} hf: ${d.hf}`)
+        differing++
+        console.log(`✗ ${file}  ${current.source.repo}`)
+        for (const d of diffs) console.log(`    ${d.field.padEnd(26)} ours: ${String(d.ours).padEnd(10)} hf: ${d.hf}`)
+        if (write) {
+            const hand = Object.fromEntries(HAND_FIELDS.map(f => [f, current[f]]))
+            await writeFile(url, JSON.stringify({ ...hand, ...fresh }, null, 4) + '\n')
+            console.log('    updated')
+        }
     }
-    console.log(`\n${keys.length - failed}/${keys.length} models match their HF config`)
-    process.exitCode = failed ? 1 : 0
+    const ok = files.length - errors - differing
+    console.log(`\n${ok}/${files.length} model files match their HF config`)
+    process.exitCode = errors || (differing && !write) ? 1 : 0
 }
 
 const args = process.argv.slice(2)
-if (args[0] === '--check') {
-    await check()
+if (args[0] === '--check' || args[0] === '--write') {
+    await sync({ write: args[0] === '--write' })
 } else if (args[0] && !args[0].startsWith('--')) {
     const mirrorIdx = args.indexOf('--mirror')
     const mirror = mirrorIdx >= 0 ? args[mirrorIdx + 1] : undefined
@@ -82,6 +89,6 @@ if (args[0] === '--check') {
         process.exitCode = 1
     }
 } else {
-    console.error('usage: node scripts/import-hf.mjs <org/repo> [--mirror <org/repo>] | --check')
+    console.error('usage: node scripts/import-hf.mjs <org/repo> [--mirror <org/repo>] | --check | --write')
     process.exitCode = 2
 }

@@ -1,0 +1,15 @@
+{
+    "gpt2-small": { "repo": "openai-community/gpt2" },
+    "gpt2-medium": { "repo": "openai-community/gpt2-medium" },
+    "gpt2-large": { "repo": "openai-community/gpt2-large" },
+    "gpt2-xl": { "repo": "openai-community/gpt2-xl" },
+    "llama3-8b": { "repo": "meta-llama/Meta-Llama-3-8B", "mirror": "NousResearch/Meta-Llama-3-8B" },
+    "llama3-70b": { "repo": "meta-llama/Meta-Llama-3-70B", "mirror": "NousResearch/Meta-Llama-3-70B" },
+    "llama31-405b": { "repo": "meta-llama/Llama-3.1-405B", "mirror": "unsloth/Meta-Llama-3.1-405B-bnb-4bit" },
+    "mixtral-8x7b": { "repo": "mistralai/Mixtral-8x7B-v0.1" },
+    "deepseek-v3": { "repo": "deepseek-ai/DeepSeek-V3" },
+    "kimi-k2": { "repo": "moonshotai/Kimi-K2-Instruct" },
+    "qwen3-235b": { "repo": "Qwen/Qwen3-235B-A22B" },
+    "llama4-scout": { "repo": "meta-llama/Llama-4-Scout-17B-16E", "mirror": "unsloth/Llama-4-Scout-17B-16E" },
+    "llama4-maverick": { "repo": "meta-llama/Llama-4-Maverick-17B-128E", "mirror": "unsloth/Llama-4-Maverick-17B-128E" }
+}

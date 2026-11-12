@@ -34,5 +34,68 @@
         "hasBias": false,
         "tiedEmbeddings": false,
         "qkNorm": false
+    },
+    "tokenizer": {
+        "kind": "sentencepiece",
+        "prompts": {
+            "The cat sat on": [
+                {
+                    "token": "The",
+                    "id": 415
+                },
+                {
+                    "token": "cat",
+                    "id": 5255
+                },
+                {
+                    "token": "sat",
+                    "id": 2495
+                },
+                {
+                    "token": "on",
+                    "id": 356
+                }
+            ],
+            "He used to live under": [
+                {
+                    "token": "He",
+                    "id": 650
+                },
+                {
+                    "token": "used",
+                    "id": 1307
+                },
+                {
+                    "token": "to",
+                    "id": 298
+                },
+                {
+                    "token": "live",
+                    "id": 2943
+                },
+                {
+                    "token": "under",
+                    "id": 916
+                }
+            ],
+            "Once upon a time": [
+                {
+                    "token": "Once",
+                    "id": 5713
+                },
+                {
+                    "token": "upon",
+                    "id": 3714
+                },
+                {
+                    "token": "a",
+                    "id": 264
+                },
+                {
+                    "token": "time",
+                    "id": 727
+                }
+            ]
+        }
     }
 }

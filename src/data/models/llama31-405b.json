@@ -37,5 +37,68 @@
         "hasBias": false,
         "tiedEmbeddings": false,
         "qkNorm": false
+    },
+    "tokenizer": {
+        "kind": "byte-level",
+        "prompts": {
+            "The cat sat on": [
+                {
+                    "token": "The",
+                    "id": 791
+                },
+                {
+                    "token": "cat",
+                    "id": 8415
+                },
+                {
+                    "token": "sat",
+                    "id": 7731
+                },
+                {
+                    "token": "on",
+                    "id": 389
+                }
+            ],
+            "He used to live under": [
+                {
+                    "token": "He",
+                    "id": 1548
+                },
+                {
+                    "token": "used",
+                    "id": 1511
+                },
+                {
+                    "token": "to",
+                    "id": 311
+                },
+                {
+                    "token": "live",
+                    "id": 3974
+                },
+                {
+                    "token": "under",
+                    "id": 1234
+                }
+            ],
+            "Once upon a time": [
+                {
+                    "token": "Once",
+                    "id": 12805
+                },
+                {
+                    "token": "upon",
+                    "id": 5304
+                },
+                {
+                    "token": "a",
+                    "id": 264
+                },
+                {
+                    "token": "time",
+                    "id": 892
+                }
+            ]
+        }
     }
 }

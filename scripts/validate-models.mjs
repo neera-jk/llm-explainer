@@ -13,14 +13,33 @@ const isNonNegInt = v => Number.isInteger(v) && v >= 0
 const isText = v => typeof v === 'string' && v.trim() !== ''
 const show = v => JSON.stringify(v)
 
+const PLAIN = /^[\w .()+/-]{1,80}$/
+const REPO = /^[\w.-]+\/[\w.-]+$/
+const NAME = /^[\w.-]{1,80}$/
+const FEATURE = /^[\w.()+-]{1,40}$/
+// Generous ceilings, well above today's largest models. A number past one is a
+// broken or hostile config, and some of them (d_model) drive loops in the browser.
+const LIMITS = {
+    d_model: 65_536, n_layers: 1_024, n_heads: 1_024, n_kv_heads: 1_024, head_dim: 4_096,
+    vocab_size: 4_000_000, context_length: 100_000_000, d_ff: 1_048_576, d_ff_expert: 1_048_576,
+    n_experts: 4_096, n_dense_layers: 1_024, sliding_window: 100_000_000,
+}
+
 function checkModel(m, file) {
     const errors = []
     const warnings = []
     const need = (ok, msg) => { if (!ok) errors.push(msg) }
 
     need(m.key === basename(file, '.json'), `key ${show(m.key)} should match the file name`)
+    need(typeof m.key === 'string' && /^[a-z0-9][a-z0-9-]*$/.test(m.key), 'key may only use lowercase letters, digits and dashes')
     for (const f of ['label', 'family', 'params']) need(isText(m[f]), `${f} must be a non-empty string`)
-    need(isText(m.source?.repo), 'source.repo must name the Hugging Face repo')
+    // text that ends up on screen or in pull requests stays to plain characters
+    for (const f of ['label', 'params']) {
+        if (isText(m[f])) need(PLAIN.test(m[f]), `${f} ${show(m[f])} has unusual characters`)
+    }
+    need(isText(m.source?.repo) && REPO.test(m.source.repo), 'source.repo must name a Hugging Face repo like org/name')
+    need(isText(m.model_type) && NAME.test(m.model_type), `model_type ${show(m.model_type)} must be a plain name`)
+    need(Array.isArray(m.architectures) && m.architectures.every(a => isText(a) && NAME.test(a)), 'architectures must be a list of plain names')
     if (isText(m.family)) {
         need(Object.hasOwn(MODEL_FAMILIES, m.family),
             `family ${show(m.family)} is not in src/data/families.js, so the model won't appear in the dropdown`)
@@ -32,12 +51,17 @@ function checkModel(m, file) {
     if (isPosInt(m.n_heads) && isPosInt(m.n_kv_heads)) {
         need(m.n_heads % m.n_kv_heads === 0, `n_heads (${m.n_heads}) must be a multiple of n_kv_heads (${m.n_kv_heads})`)
     }
+    for (const [f, max] of Object.entries(LIMITS)) {
+        if (Number.isInteger(m[f])) need(m[f] <= max, `${f} is ${m[f]}, above the sanity limit of ${max}`)
+    }
 
     const f = m.features
     if (!f || typeof f !== 'object') {
         errors.push('features is missing')
     } else {
-        for (const k of ['attn', 'norm', 'ffn', 'posEncoding']) need(isText(f[k]), `features.${k} must be a non-empty string`)
+        for (const k of ['attn', 'norm', 'ffn', 'posEncoding']) {
+            need(isText(f[k]) && FEATURE.test(f[k]), `features.${k} must be a short plain name (got ${show(f[k])})`)
+        }
         for (const k of ['hasBias', 'tiedEmbeddings', 'qkNorm']) need(typeof f[k] === 'boolean', `features.${k} must be true or false`)
         // the attention name has to agree with the head counts the diagrams draw
         const kv = m.n_kv_heads

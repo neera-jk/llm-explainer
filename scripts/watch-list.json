@@ -1,0 +1,14 @@
+{
+    "orgs": [
+        "mistralai", "deepseek-ai", "moonshotai", "Qwen", "microsoft", "openai", "openai-community",
+        "zai-org", "baidu", "MiniMaxAI", "XiaomiMiMo", "meituan-longcat", "nvidia", "tencent",
+        "ibm-granite", "internlm", "ByteDance-Seed", "LiquidAI", "inclusionAI", "sarvamai", "tiiuae",
+        "LGAI-EXAONE", "upstage", "stepfun-ai", "ServiceNow-AI", "krutrim-ai-labs", "ai4bharat",
+        "allenai", "HuggingFaceTB", "swiss-ai", "meta-llama", "google", "CohereLabs"
+    ],
+    "lookbackDays": 30,
+    "trending": { "enabled": true, "minLikes": 200 },
+    "maxPullRequestsPerRun": 5,
+    "ignoreModelTypes": [],
+    "baseBranch": "master"
+}

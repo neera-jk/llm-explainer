@@ -58,7 +58,8 @@ export function formatParams(total) {
 const FAMILY_BY_ORG = {
     'openai-community': { gpt2: 'gpt2' },
     'meta-llama': { llama: 'llama', llama4: 'llama4' },
-    mistralai: { mixtral: 'mixtral' },
+    // Mistral's dense and MoE models share a tokenizer, so they share one group
+    mistralai: { mistral: 'mixtral', mixtral: 'mixtral' },
     'deepseek-ai': { deepseek_v2: 'deepseek', deepseek_v3: 'deepseek' },
     moonshotai: { kimi_k2: 'deepseek' },
     Qwen: { qwen3: 'qwen', qwen3_moe: 'qwen' },
@@ -80,8 +81,13 @@ export function classifyFamily(modelType, repo, families) {
     // trending models can come from any org, so keep its name to plain characters
     const name = (ORG_NAMES[org] || org).replace(/[^\w .-]/g, '')
     const key = name.toLowerCase().replace(/[^a-z0-9]/g, '')
+    const label = `${name} family`
     if (Object.hasOwn(families, key)) return { key, label: families[key].label, isNew: false }
-    return { key, label: `${name} family`, isNew: true }
+    // a group can be named differently from its key (the "Mistral family" lives
+    // under 'mixtral'), so never create a second group with the same name
+    const sameName = Object.values(families).find(f => f.label === label)
+    if (sameName) return { key: sameName.key, label, isNew: false }
+    return { key, label, isNew: true }
 }
 
 // families.js is hand-formatted, so add one line before the object's closing brace

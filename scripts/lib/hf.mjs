@@ -1,3 +1,6 @@
+import { loadTokenizer, tokenizePrompts } from './tokens.mjs'
+import { PROMPT_KEYS } from '../../src/data/prompts.js'
+
 const HF = 'https://huggingface.co'
 
 export class UnknownArchitectureError extends Error {
@@ -233,10 +236,20 @@ export function hasAdapter(modelType) {
     return Object.hasOwn(ADAPTERS, modelType)
 }
 
-// the generated part of a model file: where it came from plus the normalized config
+// The generated part of a model file: where it came from, the normalized config,
+// and how its own tokenizer splits the app's example prompts.
 export async function importModel(repo, mirror) {
     const { config, source } = await fetchConfig(repo, { mirror })
-    return { source: { repo, ...(mirror && { mirror }), ...source }, ...normalize(config) }
+    const model = { source: { repo, ...(mirror && { mirror }), ...source }, ...normalize(config) }
+    try {
+        // read the tokenizer from the same repo and commit the config came from
+        const tokenizer = await loadTokenizer(source.config_from || repo, source.config_revision || source.revision)
+        model.tokenizer = { kind: tokenizer.kind, prompts: tokenizePrompts(tokenizer, PROMPT_KEYS) }
+    } catch (err) {
+        // without it the app shows the prompt words with no IDs, and validation warns
+        console.warn(`${repo}: no prompt tokens (${err.message})`)
+    }
+    return model
 }
 
 export function isMoE(m) {

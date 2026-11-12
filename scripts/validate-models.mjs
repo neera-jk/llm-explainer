@@ -6,7 +6,7 @@ import { resolve, basename } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { MODEL_FAMILIES } from '../src/data/families.js'
 import { unknownFeatures } from '../src/data/features.js'
-import { PROMPTS, NEXT_TOKEN_PREDICTIONS } from '../src/data/prompts.js'
+import { PROMPT_KEYS, NEXT_TOKEN_PREDICTIONS } from '../src/data/prompts.js'
 
 const isPosInt = v => Number.isInteger(v) && v > 0
 const isNonNegInt = v => Number.isInteger(v) && v >= 0
@@ -17,6 +17,7 @@ const PLAIN = /^[\w .()+/-]{1,80}$/
 const REPO = /^[\w.-]+\/[\w.-]+$/
 const NAME = /^[\w.-]{1,80}$/
 const FEATURE = /^[\w.()+-]{1,40}$/
+const TOKENIZER_KINDS = ['byte-level', 'sentencepiece', 'tiktoken']
 // Generous ceilings, well above today's largest models. A number past one is a
 // broken or hostile config, and some of them (d_model) drive loops in the browser.
 const LIMITS = {
@@ -98,14 +99,33 @@ function checkModel(m, file) {
     need(isNonNegInt(m.sliding_window), `sliding_window must be 0 or more (got ${show(m.sliding_window)})`)
     need(typeof m.alternating_moe === 'boolean', 'alternating_moe must be true or false')
 
-    if (isText(m.family)) {
-        const noTokens = Object.keys(PROMPTS).filter(p => !PROMPTS[p][m.family])
-        const noPreds = Object.keys(NEXT_TOKEN_PREDICTIONS).filter(p => !NEXT_TOKEN_PREDICTIONS[p][m.family])
-        if (noTokens.length || noPreds.length) {
-            warnings.push(`src/data/prompts.js has no tokens or predictions for family ${show(m.family)}, so GPT-2's are shown`)
-        }
+    checkTokenizer(m, need, warnings)
+
+    if (isText(m.family) && PROMPT_KEYS.some(p => !NEXT_TOKEN_PREDICTIONS[p]?.[m.family])) {
+        warnings.push(`src/data/prompts.js has no example predictions for family ${show(m.family)}, so GPT-2's are shown`)
     }
     return { errors, warnings }
+}
+
+// the prompt view shows these IDs, so they must be the prompt's own words and
+// real positions in the model's vocabulary
+function checkTokenizer(m, need, warnings) {
+    if (m.tokenizer === undefined) {
+        warnings.push('no tokenizer data, so the prompt view shows the words without their IDs')
+        return
+    }
+    const t = m.tokenizer
+    need(t && TOKENIZER_KINDS.includes(t.kind), `tokenizer.kind must be one of ${TOKENIZER_KINDS.join(', ')} (got ${show(t?.kind)})`)
+    for (const prompt of PROMPT_KEYS) {
+        const tokens = t?.prompts?.[prompt]
+        if (!Array.isArray(tokens)) {
+            need(false, `tokenizer.prompts is missing ${show(prompt)}`)
+            continue
+        }
+        need(tokens.map(x => x?.token).join(' ') === prompt, `tokenizer.prompts[${show(prompt)}] does not spell out the prompt`)
+        need(tokens.every(x => isNonNegInt(x?.id) && (!isPosInt(m.vocab_size) || x.id < m.vocab_size)),
+            `tokenizer.prompts[${show(prompt)}] has an ID outside the vocabulary of ${m.vocab_size}`)
+    }
 }
 
 const dir = resolve(process.argv[2] || fileURLToPath(new URL('../src/data/models/', import.meta.url)))

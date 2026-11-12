@@ -234,7 +234,8 @@ function DimensionExplorer({ tokens, vecs, accent }) {
 
 export default function EmbeddingBlock({ model, family, tokens, accent }) {
     const a = accent || { color: '#7F77DD', light: 'rgba(127,119,221,0.1)', border: 'rgba(127,119,221,0.3)', text: '#AFA9EC' }
-    const vecs = tokens.map(t => makeEmbeddingVector(t.id, model.d_model))
+    // without real IDs, seed each position differently so the example vectors still differ
+    const vecs = tokens.map((t, i) => makeEmbeddingVector(t.id ?? -(i + 1), model.d_model))
     const pos = family ? family.posEncoding : 'learned'
 
     return (

@@ -3,31 +3,9 @@
 //   node scripts/import-hf.mjs <org/repo> [--mirror <org/repo>]   print the normalized config
 //   node scripts/import-hf.mjs --check                            compare src/data/models/*.json with HF
 //   node scripts/import-hf.mjs --write                            same, and update the files that differ
-import { readdir, readFile, writeFile } from 'node:fs/promises'
-import { fetchConfig, normalize } from './lib/hf.mjs'
-
-const MODELS_DIR = new URL('../src/data/models/', import.meta.url)
-// written by hand; everything else in a model file is regenerated from HF
-const HAND_FIELDS = ['key', 'label', 'family', 'params']
-
-async function importRepo(repo, mirror) {
-    const { config, source } = await fetchConfig(repo, { mirror })
-    return { source: { repo, ...(mirror && { mirror }), ...source }, ...normalize(config) }
-}
-
-function flatten(obj, prefix = '') {
-    return Object.entries(obj).flatMap(([k, v]) =>
-        v && typeof v === 'object' && !Array.isArray(v)
-            ? flatten(v, `${prefix}${k}.`)
-            : [[`${prefix}${k}`, JSON.stringify(v)]])
-}
-
-// a new upstream commit on its own isn't a difference, so source is skipped
-function generatedFields(model) {
-    const rest = { ...model }
-    for (const f of ['source', ...HAND_FIELDS]) delete rest[f]
-    return Object.fromEntries(flatten(rest))
-}
+import { writeFile } from 'node:fs/promises'
+import { importModel } from './lib/hf.mjs'
+import { HAND_FIELDS, loadModels, generatedFields } from './lib/catalog.mjs'
 
 function diffModel(current, fresh) {
     const ours = generatedFields(current)
@@ -38,12 +16,10 @@ function diffModel(current, fresh) {
 }
 
 async function sync({ write }) {
-    const files = (await readdir(MODELS_DIR)).filter(f => f.endsWith('.json')).sort()
-    const results = await Promise.all(files.map(async file => {
-        const url = new URL(file, MODELS_DIR)
-        const current = JSON.parse(await readFile(url, 'utf8'))
+    const models = await loadModels()
+    const results = await Promise.all(models.map(async ({ file, url, model: current }) => {
         try {
-            const fresh = await importRepo(current.source.repo, current.source.mirror)
+            const fresh = await importModel(current.source.repo, current.source.mirror)
             return { file, url, current, fresh, diffs: diffModel(current, fresh) }
         } catch (err) {
             return { file, error: err.message }
@@ -71,8 +47,8 @@ async function sync({ write }) {
             console.log('    updated')
         }
     }
-    const ok = files.length - errors - differing
-    console.log(`\n${ok}/${files.length} model files match their HF config`)
+    const ok = models.length - errors - differing
+    console.log(`\n${ok}/${models.length} model files match their HF config`)
     process.exitCode = errors || (differing && !write) ? 1 : 0
 }
 
@@ -83,7 +59,7 @@ if (args[0] === '--check' || args[0] === '--write') {
     const mirrorIdx = args.indexOf('--mirror')
     const mirror = mirrorIdx >= 0 ? args[mirrorIdx + 1] : undefined
     try {
-        console.log(JSON.stringify(await importRepo(args[0], mirror), null, 4))
+        console.log(JSON.stringify(await importModel(args[0], mirror), null, 4))
     } catch (err) {
         console.error(`✗ ${args[0]}: ${err.message}`)
         process.exitCode = 1

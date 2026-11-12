@@ -7,14 +7,47 @@ export class UnknownArchitectureError extends Error {
     }
 }
 
-async function getJSON(url, token) {
+async function request(url, token) {
     const res = await fetch(url, { headers: token ? { Authorization: `Bearer ${token}` } : {} })
     if (!res.ok) {
         const err = new Error(`${res.status} ${res.statusText} for ${url}`)
         err.status = res.status
         throw err
     }
-    return res.json()
+    return res
+}
+
+async function getJSON(url, token) {
+    return (await request(url, token)).json()
+}
+
+export function getModelInfo(repo, token = process.env.HF_TOKEN) {
+    return getJSON(`${HF}/api/models/${repo}`, token)
+}
+
+// just the fields the watcher needs to filter uploads
+const LIST_FIELDS = ['createdAt', 'pipeline_tag', 'gated', 'tags', 'config', 'safetensors', 'likes']
+const expandFields = () => LIST_FIELDS.map(f => `expand[]=${f}`).join('&')
+
+// what the whole HF community is looking at right now, for one kind of model
+export function listTrending(pipeline, { limit = 100, token = process.env.HF_TOKEN } = {}) {
+    return getJSON(`${HF}/api/models?sort=trendingScore&direction=-1&limit=${limit}&filter=${encodeURIComponent(pipeline)}&${expandFields()}`, token)
+}
+
+// An org's uploads since a date, newest first. Busy orgs can upload more than
+// one page in a month, so keep following the next-page link until we pass `since`.
+export async function listModelsSince(org, since, { token = process.env.HF_TOKEN } = {}) {
+    let url = `${HF}/api/models?author=${encodeURIComponent(org)}&sort=createdAt&direction=-1&limit=100&${expandFields()}`
+    const models = []
+    while (url) {
+        const res = await request(url, token)
+        for (const m of await res.json()) {
+            if (new Date(m.createdAt) < since) return models
+            models.push(m)
+        }
+        url = res.headers.get('link')?.match(/<([^>]+)>;\s*rel="next"/)?.[1]
+    }
+    return models
 }
 
 async function fetchPinned(repo, token) {
@@ -194,6 +227,16 @@ export function normalize(config) {
         ...dims,
         features: { attn: attnType(dims), ...features },
     }
+}
+
+export function hasAdapter(modelType) {
+    return Object.hasOwn(ADAPTERS, modelType)
+}
+
+// the generated part of a model file: where it came from plus the normalized config
+export async function importModel(repo, mirror) {
+    const { config, source } = await fetchConfig(repo, { mirror })
+    return { source: { repo, ...(mirror && { mirror }), ...source }, ...normalize(config) }
 }
 
 export function isMoE(m) {

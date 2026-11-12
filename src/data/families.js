@@ -4,7 +4,7 @@
 export const MODEL_FAMILIES = {
     gpt2: { key: 'gpt2', label: 'GPT-2 family' },
     llama: { key: 'llama', label: 'Llama 3 family' },
-    mixtral: { key: 'mixtral', label: 'Mixtral family' },
+    mixtral: { key: 'mixtral', label: 'Mistral family' },
     deepseek: { key: 'deepseek', label: 'DeepSeek family' },
     qwen: { key: 'qwen', label: 'Qwen 3 family' },
     llama4: { key: 'llama4', label: 'Llama 4 family' },

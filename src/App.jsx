@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { useModel } from './hooks/useModel'
 import { PROMPT_KEYS } from './data/prompts'
+import { unknownFeatures, FEATURE_NAMES } from './data/features'
 import Pipeline from './components/Pipeline'
 import BlockDetail from './components/BlockDetail'
 import ModelSelector from './components/ModelSelector'
@@ -49,9 +50,12 @@ export default function App() {
     setActiveLayer(null)
   }
 
-  const headLabel = family.attn === 'GQA'
+  // show Q/KV whenever heads share K and V, whatever the attention type is called
+  const sharedKV = model.n_kv_heads !== model.n_heads
+  const headLabel = sharedKV
     ? `${model.n_heads}/${model.n_kv_heads}`
     : `${model.n_heads}`
+  const unexplained = unknownFeatures(model.features)
 
   return (
     <div className="app">
@@ -69,12 +73,17 @@ export default function App() {
           <div>
             <h1 className="intro-title">{model.label} architecture</h1>
             <p className="intro-desc">{model.desc}</p>
+            {unexplained.length > 0 && (
+              <p className="intro-desc" style={{ color: 'var(--text-muted)', fontSize: 12 }}>
+                Not explained in detail yet: {unexplained.map(u => `${FEATURE_NAMES[u.field]} ${u.value}`).join(', ')}.
+              </p>
+            )}
           </div>
           <div className="intro-stats">
             {[
               { val: model.n_layers, label: 'layers', tip: 'layers' },
               { val: model.d_model.toLocaleString(), label: 'dims', tip: 'dims' },
-              { val: headLabel, label: family.attn === 'GQA' ? 'Q/KV heads' : 'heads', tip: 'heads' },
+              { val: headLabel, label: sharedKV ? 'Q/KV heads' : 'heads', tip: 'heads' },
               { val: model.vocab_size.toLocaleString(), label: 'vocab', tip: 'vocab' },
             ].map(s => (
               <div key={s.label} className="istat">

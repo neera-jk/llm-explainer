@@ -1,17 +1,10 @@
 // Each model lives in ./models/<key>.json. Everything except key, label, family
 // and params is generated from the model's HF config by scripts/import-hf.mjs.
-const modelFiles = import.meta.glob('./models/*.json', { eager: true, import: 'default' })
+import { MODEL_FAMILIES } from './families'
 
-// A family is only the dropdown group (and prompt tokenizer). Architecture
-// features come from each model's own config.
-export const MODEL_FAMILIES = {
-    gpt2: { key: 'gpt2', label: 'GPT-2 family' },
-    llama: { key: 'llama', label: 'Llama 3 family' },
-    mixtral: { key: 'mixtral', label: 'Mixtral family' },
-    deepseek: { key: 'deepseek', label: 'DeepSeek family' },
-    qwen: { key: 'qwen', label: 'Qwen 3 family' },
-    llama4: { key: 'llama4', label: 'Llama 4 family' },
-}
+export { MODEL_FAMILIES }
+
+const modelFiles = import.meta.glob('./models/*.json', { eager: true, import: 'default' })
 
 export const MODEL_REGISTRY = Object.fromEntries(
     Object.values(modelFiles).map(m => [m.key, { ...m, desc: describe(m) }])
@@ -36,7 +29,8 @@ export const MODEL_GROUPS = Object.values(MODEL_FAMILIES)
 export const DEFAULT_MODEL = 'gpt2-small'
 
 export function getFamily(model) {
-    const family = MODEL_FAMILIES[model.family] || MODEL_FAMILIES.gpt2
+    // an unlisted family keeps its own name instead of borrowing another's label
+    const family = MODEL_FAMILIES[model.family] || { key: model.family, label: model.family }
     return { ...family, ...model.features }
 }
 
@@ -59,7 +53,8 @@ function describe(m) {
     const parts = [isMoE(m) ? 'MoE' : 'decoder-only', `${m.n_layers} layers`, `${m.d_model} dims`]
     if (f.attn !== 'MHA') parts.push(f.attn)
     if (f.posEncoding === 'rope') parts.push('RoPE')
-    if (f.posEncoding === 'irope') parts.push('iRoPE')
+    else if (f.posEncoding === 'irope') parts.push('iRoPE')
+    else if (f.posEncoding !== 'learned') parts.push(f.posEncoding)
     if (f.qkNorm) parts.push('QK-Norm')
     if (m.sliding_window) parts.push('SWA')
     if (isMoE(m)) {

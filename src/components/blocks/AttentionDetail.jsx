@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { vHeadDim } from '../../data/models'
+import { sharesKV, isKnownFeature } from '../../data/features'
 
 const SCORES = [
     [2.1, 0.8, 0.3, 0.5],
@@ -19,14 +20,16 @@ const WEIGHTS = [
 export default function AttentionDetail({ T, model, family, tokens }) {
     const [step, setStep] = useState(0)
 
-    const isGQA = family && family.attn === 'GQA'
+    const sharedKV = family && sharesKV(family)
     const isMLA = family && family.attn === 'MLA'
+    const knownAttn = !family || isKnownFeature('attn', family.attn)
+    const vDim = vHeadDim(model)
     const isIRoPE = family && family.posEncoding === 'irope'
     const hasRoPE = family && family.posEncoding === 'rope'
     const hasSWA = (model.sliding_window || 0) > 0
     const hasQKNorm = family && family.qkNorm === true
     const kvHeads = model.n_kv_heads || model.n_heads
-    const groupSize = isGQA ? model.n_heads / kvHeads : 1
+    const groupSize = sharedKV ? model.n_heads / kvHeads : 1
 
     const tokenNames = tokens ? tokens.map(t => t.token) : ['The', 'cat', 'sat', 'on']
     const displayTokens = tokenNames.slice(0, 4)
@@ -35,7 +38,11 @@ export default function AttentionDetail({ T, model, family, tokens }) {
         {
             title: 'Step 1: project into Q, K, V',
             desc: `The input [${T}x${model.d_model}] is multiplied by three separate weight matrices to create Query, Key, and Value vectors. Q is what each token is "looking for", K is what each token "advertises" about itself, and V is the actual information each token carries.`
-                + (isGQA ? ` With GQA, there are ${model.n_heads} Q heads but only ${kvHeads} K/V heads. Groups of ${groupSize} Q heads share the same K and V, making the KV cache ${groupSize}x smaller.` : ` Each of the ${model.n_heads} heads gets its own Q, K, and V of dimension ${model.head_dim}.`)
+                + (sharedKV
+                    ? ` With ${family.attn}, there are ${model.n_heads} Q heads but only ${kvHeads} K/V ${kvHeads === 1 ? 'head' : 'heads'}. ${kvHeads === 1 ? `All ${model.n_heads}` : `Groups of ${groupSize}`} Q heads share the same K and V, making the KV cache ${groupSize}x smaller.`
+                    : knownAttn
+                        ? ` Each of the ${model.n_heads} heads gets its own ${vDim === model.head_dim ? `Q, K, and V of dimension ${model.head_dim}` : `Q and K of dimension ${model.head_dim} and V of dimension ${vDim}`}.`
+                        : ` This model uses ${family.attn} attention, which this explainer doesn't cover in detail yet. The steps below show standard multi-head attention; this model's version may differ.`)
                 + (hasQKNorm ? ' QK-Norm applies RMSNorm to the Q and K vectors after projection but before rotation, which prevents attention scores from exploding as the model scales up.' : '')
                 + (hasRoPE ? ' After projection, RoPE rotates the Q and K vectors based on their position in the sequence. This encodes where each token sits without needing a separate position embedding.' : '')
                 + (isIRoPE ? ' This model uses iRoPE, interleaving RoPE layers with NoPE layers (no positional encoding) across the stack, which helps it generalize to extreme context lengths.' : ''),
@@ -51,7 +58,7 @@ export default function AttentionDetail({ T, model, family, tokens }) {
         },
         {
             title: 'Step 4: weights x V = context-aware output',
-            desc: `Each token's output is a weighted mix of all Value vectors. So "${displayTokens[2] || 'sat'}"'s output becomes 48% of its own Value + 35% of "${displayTokens[1] || 'cat'}"'s Value + the rest from other tokens. This runs for all ${model.n_heads} Q heads${isGQA ? ` (sharing ${kvHeads} K/V heads)` : ''}. Their outputs are concatenated and projected back to ${model.d_model} dimensions.`
+            desc: `Each token's output is a weighted mix of all Value vectors. So "${displayTokens[2] || 'sat'}"'s output becomes 48% of its own Value + 35% of "${displayTokens[1] || 'cat'}"'s Value + the rest from other tokens. This runs for all ${model.n_heads} Q heads${sharedKV ? ` (sharing ${kvHeads} K/V ${kvHeads === 1 ? 'head' : 'heads'})` : ''}. Their outputs are concatenated and projected back to ${model.d_model} dimensions.`
                 + (isMLA ? ' With MLA, the compressed latent K and V are decompressed back to full head dimension at this stage, so the cache stays small while attention still runs at full width.' : ''),
         },
     ]
@@ -200,7 +207,7 @@ export default function AttentionDetail({ T, model, family, tokens }) {
                                 <rect x="318" y="34" width="56" height="32" rx="4" fill="rgba(127,119,221,0.08)" stroke="rgba(127,119,221,0.25)" strokeWidth="0.5" />
                                 <text x="346" y="54" fontSize="9" fill="#AFA9EC" textAnchor="middle" fontFamily="var(--font-mono)">[{T}x{model.d_model}]</text>
                             </svg>
-                            <p className="attn-note">{model.n_heads} Q heads{isGQA ? `, ${kvHeads} KV heads` : ''} of {vHeadDim(model)} dimensions each, concatenated back to {model.d_model} dimensions.</p>
+                            <p className="attn-note">{model.n_heads} Q heads{sharedKV ? `, ${kvHeads} KV ${kvHeads === 1 ? 'head' : 'heads'}` : ''} of {vDim} dimensions each, concatenated back to {model.d_model} dimensions.</p>
                         </div>
                     )}
                 </motion.div>

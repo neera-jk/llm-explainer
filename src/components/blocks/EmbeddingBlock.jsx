@@ -235,6 +235,7 @@ function DimensionExplorer({ tokens, vecs, accent }) {
 export default function EmbeddingBlock({ model, family, tokens, accent }) {
     const a = accent || { color: '#7F77DD', light: 'rgba(127,119,221,0.1)', border: 'rgba(127,119,221,0.3)', text: '#AFA9EC' }
     const vecs = tokens.map(t => makeEmbeddingVector(t.id, model.d_model))
+    const pos = family ? family.posEncoding : 'learned'
 
     return (
         <div className="block-content">
@@ -244,11 +245,13 @@ export default function EmbeddingBlock({ model, family, tokens, accent }) {
                     matrix [{model.vocab_size.toLocaleString()} x {model.d_model}]</strong>, which returns
                 a list of {model.d_model} numbers (called a vector) for each token. These numbers encode meaning:
                 words with similar meanings end up with similar vectors.
-                {family && family.posEncoding === 'irope'
+                {pos === 'irope'
                     ? ' Position is not added here. This model uses iRoPE, interleaving RoPE and NoPE layers inside attention for extreme context lengths.'
-                    : family && family.posEncoding === 'rope'
+                    : pos === 'rope'
                         ? ' Position is not added here. This model uses RoPE, applied inside each attention layer.'
-                        : ' A learned positional embedding is also added here so the model knows the order of the tokens.'
+                        : pos === 'learned'
+                            ? ' A learned positional embedding is also added here so the model knows the order of the tokens.'
+                            : ` This model encodes token order using ${pos}, which this explainer doesn't cover in detail yet.`
                 }
             </p>
 

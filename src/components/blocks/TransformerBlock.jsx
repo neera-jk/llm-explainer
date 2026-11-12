@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getFamily, isMoE, getFFNLabel, ffnWidth, vHeadDim } from '../../data/models'
+import { sharesKV, ffnShape, isKnownFeature, widthChange } from '../../data/features'
 import AttentionDetail from './AttentionDetail'
 import FFNDetail from './FFNDetail'
 import MatmulViz from './MatmulViz'
@@ -61,15 +62,15 @@ function AddCircle({ tipText }) {
     )
 }
 
-function AttentionArch({ model, fam, T }) {
-    const isGQA = fam.attn === 'GQA'
+export function AttentionArch({ model, fam, T }) {
+    const sharedKV = sharesKV(fam)
     const isMLA = fam.attn === 'MLA'
     const isIRoPE = fam.posEncoding === 'irope'
     const hasRoPE = fam.posEncoding === 'rope' || isIRoPE
     const hasQKNorm = fam.qkNorm === true
     const hasSWA = (model.sliding_window || 0) > 0
     const kvHeads = model.n_kv_heads || model.n_heads
-    const groupSize = isGQA ? model.n_heads / kvHeads : 1
+    const groupSize = sharedKV ? model.n_heads / kvHeads : 1
 
     return (
         <div className="arch-body">
@@ -134,10 +135,12 @@ function AttentionArch({ model, fam, T }) {
                 </div>
             </div>
             <div className="arch-pills">
-                {isGQA && <span className="arch-pill arch-pill--green">{groupSize} Q heads share each K/V pair</span>}
+                {sharedKV && <span className="arch-pill arch-pill--green">{kvHeads === 1 ? `all ${model.n_heads} Q heads share one K/V pair` : `${groupSize} Q heads share each K/V pair`}</span>}
                 {isMLA && <span className="arch-pill arch-pill--green">latent KV compression</span>}
+                {!isKnownFeature('attn', fam.attn) && <span className="arch-pill arch-pill--amber">{fam.attn}: not explained in detail yet</span>}
                 {hasRoPE && <span className="arch-pill arch-pill--green">{isIRoPE ? 'iRoPE' : 'RoPE'} encodes position via rotation</span>}
-                {!hasRoPE && <span className="arch-pill arch-pill--purple">position from learned embeddings</span>}
+                {fam.posEncoding === 'learned' && <span className="arch-pill arch-pill--purple">position from learned embeddings</span>}
+                {!isKnownFeature('posEncoding', fam.posEncoding) && <span className="arch-pill arch-pill--amber">position via {fam.posEncoding}: not explained in detail yet</span>}
                 {hasQKNorm && <span className="arch-pill arch-pill--green">QK-Norm stabilizes training</span>}
                 {isIRoPE && <span className="arch-pill arch-pill--green">iRoPE: RoPE + NoPE layers interleaved</span>}
                 {hasSWA && <span className="arch-pill arch-pill--amber">sliding window: {model.sliding_window} tokens</span>}
@@ -147,11 +150,15 @@ function AttentionArch({ model, fam, T }) {
                     : <span className="arch-pill arch-pill--amber">KV cache: {kvHeads} x {model.head_dim}d per layer</span>}
             </div>
             <p className="arch-hint">
-                {isGQA
-                    ? `Grouped Query Attention: ${model.n_heads} query heads grouped into ${kvHeads} groups of ${groupSize}. Each group shares one K and one V, making the KV cache ${groupSize}x smaller than standard MHA.`
+                {sharedKV
+                    ? kvHeads === 1
+                        ? `Multi-Query Attention: all ${model.n_heads} query heads share a single K and V, making the KV cache ${groupSize}x smaller than standard MHA.`
+                        : `Grouped Query Attention: ${model.n_heads} query heads grouped into ${kvHeads} groups of ${groupSize}. Each group shares one K and one V, making the KV cache ${groupSize}x smaller than standard MHA.`
                     : isMLA
                         ? 'Multi-head Latent Attention: K and V are compressed into a low-dimensional latent space before caching, dramatically reducing memory for long contexts.'
-                        : `Multi-Head Attention: all ${model.n_heads} heads have their own Q, K, and V. Simple but the KV cache stores ${model.n_heads} separate K and V per layer.`
+                        : fam.attn === 'MHA'
+                            ? `Multi-Head Attention: all ${model.n_heads} heads have their own Q, K, and V. Simple but the KV cache stores ${model.n_heads} separate K and V per layer.`
+                            : `${fam.attn}: an attention variant this explainer doesn't cover in detail yet. The diagram shows standard multi-head attention; this model's version may differ.`
                 }
                 {hasQKNorm ? ' QK-Norm applies RMSNorm to the Q and K vectors after projection but before rotation, preventing attention scores from exploding as the model scales up.' : ''}
                 {isIRoPE ? ' iRoPE interleaves RoPE layers (with chunked local attention) and NoPE layers (no positional encoding, full causal mask), which is key to reaching extreme context lengths.' : ''}
@@ -161,13 +168,13 @@ function AttentionArch({ model, fam, T }) {
     )
 }
 
-function FFNArch({ model, fam, T }) {
-    const isSwiGLU = fam.ffn === 'SwiGLU'
+export function FFNArch({ model, fam, T }) {
+    const shape = ffnShape(fam)
     const isMoEModel = isMoE(model)
     const hasSharedExperts = (model.n_shared_experts || 0) > 0
     const isAlternating = model.alternating_moe === true
     const dFF = ffnWidth(model)
-    const ratio = (dFF / model.d_model).toFixed(1)
+    const widthNote = widthChange(dFF, model.d_model)
 
     return (
         <div className="arch-body">
@@ -186,7 +193,7 @@ function FFNArch({ model, fam, T }) {
                         <ArchArrow color="lf-pulse--amber" />
                     </>
                 )}
-                {isSwiGLU ? (
+                {shape.gated ? (
                     <>
                         <div className="arch-fan">
                             <div className="arch-fan-item" style={{ background: 'rgba(184,84,40,0.08)', border: '1px solid rgba(184,84,40,0.25)', color: '#b85428' }}>
@@ -198,9 +205,9 @@ function FFNArch({ model, fam, T }) {
                         </div>
                         <ArchArrow color="lf-pulse--amber" />
                         <div className="arch-node arch-node--amber" style={{ height: 64 }}>
-                            <span className="arch-node-title">swish(gate) x up</span>
+                            <span className="arch-node-title">{shape.activation}(gate) x up</span>
                             <span className="arch-node-sub">[{T}x{dFF}]</span>
-                            <span className="arch-expand-note">{ratio}x wider</span>
+                            <span className="arch-expand-note">{widthNote}</span>
                         </div>
                     </>
                 ) : (
@@ -211,9 +218,9 @@ function FFNArch({ model, fam, T }) {
                         </div>
                         <ArchArrow color="lf-pulse--amber" />
                         <div className="arch-node arch-node--amber arch-node--tall">
-                            <span className="arch-node-title">GELU</span>
+                            <span className="arch-node-title">{shape.activation}</span>
                             <span className="arch-node-sub">[{T}x{dFF}]</span>
-                            <span className="arch-expand-note">{ratio}x wider</span>
+                            <span className="arch-expand-note">{widthNote}</span>
                         </div>
                     </>
                 )}
@@ -229,17 +236,18 @@ function FFNArch({ model, fam, T }) {
                 </div>
             </div>
             <div className="arch-pills">
-                {isSwiGLU && <span className="arch-pill arch-pill--amber">SwiGLU: 3 weight matrices (gate, up, down)</span>}
-                {!isSwiGLU && <span className="arch-pill arch-pill--amber">GELU: 2 weight matrices (up, down)</span>}
+                {shape.gated && <span className="arch-pill arch-pill--amber">{fam.ffn}: 3 weight matrices (gate, up, down)</span>}
+                {!shape.gated && <span className="arch-pill arch-pill--amber">{fam.ffn}: 2 weight matrices (up, down)</span>}
+                {!isKnownFeature('ffn', fam.ffn) && <span className="arch-pill arch-pill--amber">{fam.ffn}: not explained in detail yet</span>}
                 {isMoEModel && <span className="arch-pill arch-pill--green">only {model.n_active_experts} of {model.n_experts} experts active per token</span>}
                 {hasSharedExperts && <span className="arch-pill arch-pill--green">+{model.n_shared_experts} shared expert always active</span>}
                 {isAlternating && <span className="arch-pill arch-pill--amber">dense and MoE layers alternate</span>}
                 {(model.n_dense_layers || 0) > 0 && <span className="arch-pill arch-pill--amber">first {model.n_dense_layers} layers are dense</span>}
             </div>
             <p className="arch-hint">
-                {isSwiGLU
-                    ? `SwiGLU uses three weight matrices instead of two. W_gate and W_up project in parallel, then the gate output (after swish activation) controls which features from W_up pass through.`
-                    : `Standard FFN: expand to ${dFF} dimensions with W_up, apply GELU activation, then compress back to ${model.d_model} with W_down.`
+                {shape.gated
+                    ? `${fam.ffn} uses three weight matrices instead of two. W_gate and W_up project in parallel, then the gate output (after ${shape.activation} activation) controls which features from W_up pass through.`
+                    : `Standard FFN: expand to ${dFF} dimensions with W_up, apply ${shape.activation} activation, then compress back to ${model.d_model} with W_down.`
                 }
                 {isMoEModel ? ` With MoE, each token is routed to only ${model.n_active_experts} of ${model.n_experts} available expert FFNs. Massive total capacity, but only a fraction runs per token.` : ''}
                 {hasSharedExperts ? ` ${model.n_shared_experts} shared expert also runs on every token, giving a stable baseline on top of the routed experts.` : ''}
@@ -274,7 +282,9 @@ export default function TransformerBlock({ model, tokens, layerIndex, family }) 
     }
 
     const attnLabel = fam.attn === 'MHA' ? 'self-attention' : fam.attn
-    const attnSub = fam.attn === 'GQA'
+    const sharedKV = sharesKV(fam)
+    const groupSize = model.n_heads / model.n_kv_heads
+    const attnSub = sharedKV
         ? `${model.n_heads}Q / ${model.n_kv_heads}KV heads`
         : fam.attn === 'MLA'
             ? `${model.n_heads} heads, latent KV`
@@ -290,9 +300,13 @@ export default function TransformerBlock({ model, tokens, layerIndex, family }) 
             <p className="layer-detail-intro">
                 <strong>Layer {layerIndex}</strong> of {model.n_layers}. Data flows left to right.
                 First, the input is normalized using <strong>{fam.norm}</strong>
-                {fam.norm === 'RMSNorm' ? ' (a simpler, faster alternative to LayerNorm that skips mean subtraction)' : ' (stabilizes values by subtracting the mean and dividing by standard deviation)'}.
+                {fam.norm === 'RMSNorm'
+                    ? ' (a simpler, faster alternative to LayerNorm that skips mean subtraction)'
+                    : fam.norm === 'LayerNorm'
+                        ? ' (stabilizes values by subtracting the mean and dividing by standard deviation)'
+                        : ' (a normalization method this explainer doesn\'t cover in detail yet)'}.
                 Then <strong>{attnLabel}</strong> lets every token look at every other token to gather context.
-                {fam.attn === 'GQA' ? ` In GQA, groups of ${model.n_heads / model.n_kv_heads} query heads share the same key and value, making the KV cache ${model.n_heads / model.n_kv_heads}x smaller.` : ''}
+                {sharedKV ? ` In ${fam.attn}, ${model.n_kv_heads === 1 ? `all ${model.n_heads}` : `groups of ${groupSize}`} query heads share the same key and value, making the KV cache ${groupSize}x smaller.` : ''}
                 {hasQKNorm ? ' QK-Norm applies RMSNorm to the query and key vectors before rotation, keeping attention scores stable at large scale.' : ''}
                 {hasRoPE && !isIRoPE ? ' RoPE (Rotary Position Embeddings) is applied inside attention to encode where each token sits in the sequence.' : ''}
                 {isIRoPE ? ' iRoPE interleaves RoPE layers with NoPE layers (no positional encoding) inside attention, which unlocks extreme context lengths.' : ''}
@@ -301,7 +315,7 @@ export default function TransformerBlock({ model, tokens, layerIndex, family }) 
                 is added back to the sub-block's output at the "+" circle. This helps the model train
                 by giving gradients a shortcut through the network.
                 Then another {fam.norm}, followed by the <strong>{ffnLabel}</strong>
-                {fam.ffn === 'SwiGLU' && !isMoEModel ? ' which uses a gating mechanism with three weight matrices' : ''}
+                {ffnShape(fam).gated && !isMoEModel ? ' which uses a gating mechanism with three weight matrices' : ''}
                 {isMoEModel ? ` where a router sends each token to ${model.n_active_experts} of ${model.n_experts} expert networks` : ''}.
                 {hasSharedExperts ? ` A shared expert also runs on every token regardless of routing, providing a stable baseline.` : ''}
                 {isAlternating ? ' In this model, dense and MoE layers alternate through the stack to stabilize training.' : ''}

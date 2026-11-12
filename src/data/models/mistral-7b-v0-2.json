@@ -1,0 +1,38 @@
+{
+    "key": "mistral-7b-v0-2",
+    "label": "Mistral 7B v0.2",
+    "family": "mistral",
+    "params": "7.2B",
+    "source": {
+        "repo": "mistralai/Mistral-7B-Instruct-v0.2",
+        "revision": "63a8b081895390a26e140280378bc85ec8bce07a"
+    },
+    "model_type": "mistral",
+    "architectures": [
+        "MistralForCausalLM"
+    ],
+    "d_model": 4096,
+    "n_layers": 32,
+    "n_heads": 32,
+    "n_kv_heads": 8,
+    "head_dim": 128,
+    "vocab_size": 32000,
+    "context_length": 32768,
+    "d_ff": 14336,
+    "sliding_window": 0,
+    "d_ff_expert": null,
+    "n_experts": 0,
+    "n_active_experts": 0,
+    "n_shared_experts": 0,
+    "n_dense_layers": 0,
+    "alternating_moe": false,
+    "features": {
+        "attn": "GQA",
+        "norm": "RMSNorm",
+        "ffn": "SwiGLU",
+        "posEncoding": "rope",
+        "hasBias": false,
+        "tiedEmbeddings": false,
+        "qkNorm": false
+    }
+}

@@ -1,0 +1,101 @@
+{
+    "key": "qwen3-4b",
+    "label": "Qwen3 4B",
+    "family": "qwen",
+    "params": "4B",
+    "source": {
+        "repo": "Qwen/Qwen3-4B-Base",
+        "revision": "906bfd4b4dc7f14ee4320094d8b41684abff8539"
+    },
+    "model_type": "qwen3",
+    "architectures": [
+        "Qwen3ForCausalLM"
+    ],
+    "d_model": 2560,
+    "n_layers": 36,
+    "n_heads": 32,
+    "n_kv_heads": 8,
+    "head_dim": 128,
+    "vocab_size": 151936,
+    "context_length": 32768,
+    "d_ff": 9728,
+    "sliding_window": 0,
+    "d_ff_expert": null,
+    "n_experts": 0,
+    "n_active_experts": 0,
+    "n_shared_experts": 0,
+    "n_dense_layers": 0,
+    "alternating_moe": false,
+    "features": {
+        "attn": "GQA",
+        "norm": "RMSNorm",
+        "ffn": "SwiGLU",
+        "posEncoding": "rope",
+        "hasBias": false,
+        "tiedEmbeddings": true,
+        "qkNorm": true
+    },
+    "tokenizer": {
+        "kind": "byte-level",
+        "prompts": {
+            "The cat sat on": [
+                {
+                    "token": "The",
+                    "id": 785
+                },
+                {
+                    "token": "cat",
+                    "id": 8251
+                },
+                {
+                    "token": "sat",
+                    "id": 7578
+                },
+                {
+                    "token": "on",
+                    "id": 389
+                }
+            ],
+            "He used to live under": [
+                {
+                    "token": "He",
+                    "id": 1519
+                },
+                {
+                    "token": "used",
+                    "id": 1483
+                },
+                {
+                    "token": "to",
+                    "id": 311
+                },
+                {
+                    "token": "live",
+                    "id": 3887
+                },
+                {
+                    "token": "under",
+                    "id": 1212
+                }
+            ],
+            "Once upon a time": [
+                {
+                    "token": "Once",
+                    "id": 12522
+                },
+                {
+                    "token": "upon",
+                    "id": 5193
+                },
+                {
+                    "token": "a",
+                    "id": 264
+                },
+                {
+                    "token": "time",
+                    "id": 882
+                }
+            ]
+        }
+    }
+}

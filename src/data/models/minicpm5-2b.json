@@ -1,0 +1,101 @@
+{
+    "key": "minicpm5-2b",
+    "label": "MiniCPM5 2B",
+    "family": "openbmb",
+    "params": "2.5B",
+    "source": {
+        "repo": "openbmb/MiniCPM5-2B",
+        "revision": "42433e90dad95123ab87729fd7011e7110629556"
+    },
+    "model_type": "llama",
+    "architectures": [
+        "LlamaForCausalLM"
+    ],
+    "d_model": 2048,
+    "n_layers": 42,
+    "n_heads": 16,
+    "n_kv_heads": 2,
+    "head_dim": 128,
+    "vocab_size": 130560,
+    "context_length": 131072,
+    "d_ff": 6144,
+    "sliding_window": 0,
+    "d_ff_expert": null,
+    "n_experts": 0,
+    "n_active_experts": 0,
+    "n_shared_experts": 0,
+    "n_dense_layers": 0,
+    "alternating_moe": false,
+    "features": {
+        "attn": "GQA",
+        "norm": "RMSNorm",
+        "ffn": "SwiGLU",
+        "posEncoding": "rope",
+        "hasBias": false,
+        "tiedEmbeddings": false,
+        "qkNorm": false
+    },
+    "tokenizer": {
+        "kind": "byte-level",
+        "prompts": {
+            "The cat sat on": [
+                {
+                    "token": "The",
+                    "id": 608
+                },
+                {
+                    "token": "cat",
+                    "id": 4546
+                },
+                {
+                    "token": "sat",
+                    "id": 2359
+                },
+                {
+                    "token": "on",
+                    "id": 376
+                }
+            ],
+            "He used to live under": [
+                {
+                    "token": "He",
+                    "id": 1687
+                },
+                {
+                    "token": "used",
+                    "id": 1276
+                },
+                {
+                    "token": "to",
+                    "id": 317
+                },
+                {
+                    "token": "live",
+                    "id": 4563
+                },
+                {
+                    "token": "under",
+                    "id": 1000
+                }
+            ],
+            "Once upon a time": [
+                {
+                    "token": "Once",
+                    "id": 14433
+                },
+                {
+                    "token": "upon",
+                    "id": 2808
+                },
+                {
+                    "token": "a",
+                    "id": 280
+                },
+                {
+                    "token": "time",
+                    "id": 845
+                }
+            ]
+        }
+    }
+}

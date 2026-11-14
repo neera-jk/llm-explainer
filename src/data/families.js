@@ -8,4 +8,5 @@ export const MODEL_FAMILIES = {
     deepseek: { key: 'deepseek', label: 'DeepSeek family' },
     qwen: { key: 'qwen', label: 'Qwen 3 family' },
     llama4: { key: 'llama4', label: 'Llama 4 family' },
+    openbmb: { key: 'openbmb', label: 'openbmb family' },
 }
